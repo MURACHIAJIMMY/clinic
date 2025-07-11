@@ -101,14 +101,14 @@ export default function BookAppointment() {
             className="w-8 h-8 rounded-full object-cover border border-blue-500"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-black-200 flex items-center justify-center text-xs text-gray-500">
-            ?
+          <div className="w-8 h-8 rounded-full bg-black-400 flex items-center justify-center text-xs text-white-800">
+            👨
           </div>
         )}
 
         <Button
           onClick={handleLogout}
-          className="bg-black-500 text-white-800 hover:bg-red-400"
+          className="bg-black-800 text-grey-100 hover:bg-red-300"
         >
           Logout
         </Button>
@@ -130,7 +130,7 @@ export default function BookAppointment() {
         </Link>
         <Button
           asChild
-          className="bg-yellow-100 text-yellow-800 hover:bg-green-500 px-4 py-2 rounded font-medium"
+          className="bg-yellow-100 text-yellow-800 hover:bg-green-400 px-4 py-2 rounded font-medium"
         >
           <Link to="/profile">Profile Settings</Link>
         </Button>
@@ -193,7 +193,7 @@ export default function BookAppointment() {
             </div>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-full"
             >
               Submit
             </button>
