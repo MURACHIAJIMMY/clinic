@@ -88,7 +88,7 @@ export default function BookAppointment() {
           <FiBell
             size={36}
             className={`cursor-pointer ${
-              hasSoonAppointment ? 'text-red-1000 animate-pulse' : 'text-green-1000'
+              hasSoonAppointment ? 'text-red-600 animate-pulse' : 'text-green-500'
             }`}
           />
         </Link>
@@ -108,7 +108,7 @@ export default function BookAppointment() {
 
         <Button
           onClick={handleLogout}
-          className="bg-black-800 text-grey-100 hover:bg-red-600"
+          className="bg-grey-800 text-grey-100 hover:bg-red-200"
         >
           Logout
         </Button>
