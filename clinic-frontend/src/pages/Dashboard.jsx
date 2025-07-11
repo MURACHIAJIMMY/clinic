@@ -18,10 +18,13 @@ export default function Dashboard() {
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-bold">Hello, {user?.name} 👋</h1>
+            <h1 className="text-4xl font-bold">Hello,👋👋 {user?.name} </h1>
             <p className="text-gray-600">
-              You're logged in and ready to schedule or view your appointments? click BookAppointment👈👈.
+              You're now logged in and ready to schedule or view your appointments 📅📅 
             </p>
+            <p className="text-gray-800 font-semibold">
+              click BookAppointment👈👈.
+              </p>
           </>
         )}
       </div>
