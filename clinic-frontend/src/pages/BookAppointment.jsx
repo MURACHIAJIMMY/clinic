@@ -108,7 +108,7 @@ export default function BookAppointment() {
 
         <Button
           onClick={handleLogout}
-          className="bg-black-800 text-grey-100 hover:bg-red-300"
+          className="bg-black-800 text-grey-100 hover:bg-red-600"
         >
           Logout
         </Button>
@@ -193,7 +193,7 @@ export default function BookAppointment() {
             </div>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-full"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-300 w-full"
             >
               Submit
             </button>
