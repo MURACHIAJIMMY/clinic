@@ -86,9 +86,9 @@ export default function BookAppointment() {
       <div className="absolute top-6 right-6 flex items-center gap-4 z-20">
         <Link to="/appointments/upcoming" title="View Upcoming Appointments">
           <FiBell
-            size={36}
+            size={34}
             className={`cursor-pointer ${
-              hasSoonAppointment ? 'text-red-600 animate-pulse' : 'text-green-500'
+              hasSoonAppointment ? 'text-red-600 animate-bounce' : 'text-green-500'
             }`}
           />
         </Link>
