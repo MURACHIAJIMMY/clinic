@@ -1,58 +1,95 @@
+
+
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const path = require('path'); // ✅ Import path for static file serving
+const path = require('path');
 const connectDB = require('./config/db');
+const chatRoutes = require('./routes/chat'); // ✅ Mounted correctly
+const { saveMessage } = require('./controllers/chatController'); // ✅ Optional for future usage
 
-dotenv.config(); // ✅ Load environment variables
-connectDB(); // ✅ Connect to MongoDB
+dotenv.config();
+connectDB();
 
 const app = express();
+const server = http.createServer(app);
 
-// ✅ Middleware should come FIRST
+// ✅ Initialize Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST']
+  }
+});
+
+// ✅ Middleware
 app.use(express.json());
 app.use(cors());
-
-// ✅ Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// ✅ File upload middleware
-const doctorRoutes = require('./routes/doctorRoutes');
-app.use('/api/doctors', doctorRoutes);
 
+// ✅ RESTful Routes
+app.use('/api/doctors', require('./routes/doctorRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/appointments', require('./routes/appointmentRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/patients', require('./routes/patientRoutes'));
+app.use('/api', chatRoutes); // ✅ Routes for chatRoom and manual tests
 
-// ✅ Debugging: Log incoming requests for easy tracking
-app.use((req, res, next) => {
-    console.log(`Received ${req.method} request at ${req.url}`);
-    console.log('Request body:', req.body);
-    next();
-});
-
-// ✅ Base route
-app.get('/', (req, res) => {
-    res.send('Clinic System API is running...');
-});
-
-// ✅ Authentication routes
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
-
-// ✅ Appointment routes
-const appointmentRoutes = require('./routes/appointmentRoutes');
-app.use('/api/appointments', appointmentRoutes);
-
-// ✅ 🆕 User routes (for role update and user profile update)
-const userRoutes = require('./routes/userRoutes');
-app.use('/api/users', userRoutes);
-
-// ✅ Patient routes
-const patientRoutes = require('./routes/patientRoutes');
-app.use('/api/patients', patientRoutes);
-
-// ✅ Test POST Route
 app.post('/test', (req, res) => {
-    res.json({ message: 'Test POST request received!' });
+  res.json({ message: 'Test POST request received!' });
+});
+
+app.get('/', (req, res) => {
+  res.send('Clinic System API is running...');
+});
+
+// ✅ Request Logger
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request at ${req.url}`);
+  console.log('Request body:', req.body);
+  next();
+});
+
+// ✅ Socket.IO Events
+io.on('connection', (socket) => {
+  console.log('🔌 Socket connected:', socket.id);
+
+  // Join a room
+  socket.on('joinRoom', ({ roomId }) => {
+    console.log('🧪 joinRoom event received with roomId:', roomId);
+    socket.join(roomId);
+    console.log(`📥 ${socket.id} joined room ${roomId}`);
+  });
+
+  // Handle incoming messages
+  socket.on('chatMessage', ({ roomId, message, senderId, createdAt }) => {
+    const payload = { roomId, message, senderId, createdAt };
+    io.to(roomId).emit('chatMessage', payload);
+  });
+
+  // Typing indicators
+  socket.on('typing', ({ roomId, userId }) => {
+    socket.to(roomId).emit('userTyping', { userId });
+  });
+
+  socket.on('stopTyping', ({ roomId, userId }) => {
+    socket.to(roomId).emit('userStoppedTyping', { userId });
+  });
+
+  // Doctor presence status
+  socket.on('doctorOnline', ({ doctorId }) => {
+    io.emit('doctorStatus', { doctorId, status: 'online' });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('🔴 Socket disconnected:', socket.id);
+  });
 });
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT} 🚀🚀`));
+server.listen(PORT, () => {
+  console.log(`✅ Server + Socket.IO running on port ${PORT} 🚀`);
+});

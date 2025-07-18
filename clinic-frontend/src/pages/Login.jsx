@@ -89,7 +89,8 @@ export default function Login() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full bg-black text-white hover:bg-blue-600 transition-colors">
+            
             Login
           </Button>
 
