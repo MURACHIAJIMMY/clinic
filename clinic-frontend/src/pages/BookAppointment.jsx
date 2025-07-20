@@ -136,6 +136,12 @@ export default function BookAppointment() {
         >
           Upcoming Appointments
         </Link>
+        <Button
+        className="mt-6 bg-green-600 hover:bg-green-700 text-white"
+        onClick={() => navigate('/doctors')}
+      >
+        👩‍⚕️ Browse All Doctors
+      </Button>
         <Link
           to="/appointments/history"
           className="bg-gray-300 text-gray-800 px-4 py-2 rounded font-medium hover:bg-gray-400"
