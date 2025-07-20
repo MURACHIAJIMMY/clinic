@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/axios';
+import Button from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function AppointmentHistory() {
   const [appointments, setAppointments] = useState([]);
@@ -22,7 +24,18 @@ export default function AppointmentHistory() {
   }, []);
 
   return (
-    <div className="min-h-screen px-6 py-10 bg-gray-100">
+    <div className="relative min-h-screen px-6 py-10 bg-gray-100">
+      {/* 📌 Top-right button */}
+      <Button
+        as={Link}
+        to="/book"
+        variant="default"
+        size="default"
+        className="absolute top-6 right-6 bg-purple-600 hover:bg-purple-700 z-10"
+      >
+        📅 Go back
+      </Button>
+
       <h1 className="text-2xl font-bold mb-6">Appointment History</h1>
 
       {appointments.length === 0 ? (

@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import api from '@/lib/axios';
 
 export default function Profile() {
-  const user = useAuth();
+  const {user} = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewURL, setPreviewURL] = useState('');
   const [currentImage, setCurrentImage] = useState('');
@@ -96,18 +96,25 @@ export default function Profile() {
             No Image
           </div>
         )}
+<div className="text-gray-700 space-y-1">
+  <p><strong>Name:</strong> {profile.name || user.name}</p>
+  <p><strong>Email:</strong> {profile.email || user.email}</p>
+  <p><strong>Role:</strong> {user.role}</p>
 
-        <div className="text-gray-700 space-y-1">
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Role:</strong> {user.role}</p>
+  {/* only show phone here when a patient is logged in */}
+  {user.role === 'patient' && profile.phone && (
+    <p><strong>Phone:</strong> {profile.phone}</p>
+  )}
+</div>
 
-          {user.role === 'doctor' && (
-            <>
-              <p><strong>Specialization:</strong> {profile.specialization || '—'}</p>
-              <p><strong>Phone:</strong> {profile.phone || '—'}</p>
-            </>
-          )}
-        </div>
+{/* doctor‐only section */}
+{user.role === 'doctor' && (
+  <div className="text-gray-700 space-y-1">
+    <p><strong>Specialization:</strong> {profile.specialization || '—'}</p>
+    <p><strong>Phone:</strong> {profile.phone || '—'}</p>
+  </div>
+)}
+
 
         <div className="w-full space-y-2">
           <input

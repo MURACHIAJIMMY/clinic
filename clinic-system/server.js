@@ -36,7 +36,6 @@ app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/patients', require('./routes/patientRoutes'));
 app.use('/api', chatRoutes); // ✅ Routes for chatRoom and manual tests
-
 app.post('/test', (req, res) => {
   res.json({ message: 'Test POST request received!' });
 });

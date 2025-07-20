@@ -1,7 +1,8 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
+import Button from "@/components/ui/button"; // ⬅️ no curly braces!
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -31,7 +32,7 @@ export default function Login() {
       if (user.role === 'doctor') {
         navigate('/dashboard');
       } else if (user.role === 'patient') {
-        navigate('/book');
+        navigate('/dashboard');
       } else {
         navigate('/dashboard');
       }

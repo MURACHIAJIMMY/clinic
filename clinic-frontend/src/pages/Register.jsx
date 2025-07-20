@@ -2,7 +2,8 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
+import Button from "@/components/ui/button"; // ⬅️ no curly braces!
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
