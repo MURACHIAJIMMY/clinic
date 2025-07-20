@@ -158,7 +158,7 @@ export default function BookAppointment() {
         {/* Chat Button for selected doctor */}
         {form.doctorName && (
           <Link
-            to={`/chat/${form.doctorName}/${user._id}`}
+            to={`/chat/${selectedDoctor._id}/${user._id}`}
             className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
           >
             💬 Chat with Dr. {selectedDoctor?.name || 'Selected'}

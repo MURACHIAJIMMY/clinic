@@ -1,149 +1,134 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import SocketContext from '@/context/SocketContext';
-import useAuth from '@/hooks/useAuth';
+
+
+import { useContext, useEffect, useState, useRef } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import SocketContext from '@/context/SocketContext'
+import useAuth from '@/hooks/useAuth'
 
 export default function ChatPanel() {
-  console.log('🧪 ChatPanel mounted');
+  const navigate = useNavigate()
+  const auth = useAuth()
+  const user = auth?.user ?? auth
+  const userId = user?._id || user?.id
 
-  const socket = useContext(SocketContext);
-  const auth = useAuth();
-  const user = auth?.user;
+  const { doctorId, patientId } = useParams()
+  const roomId = `doctor_${doctorId}_patient_${patientId}`
 
-  const { doctorId, patientId } = useParams();
-  const roomId = `doctor_${doctorId}_patient_${patientId}`;
+  const socket = useContext(SocketContext)
+  const ready  = Boolean(socket) && Boolean(userId)
 
-  // 🔍 Log each piece individually for step-by-step readiness tracking
-  console.log('🧵 Socket ready:', !!socket);
-  console.log('👤 User ready:', !!user);
-  console.log('🆔 User ID ready:', !!user?._id);
+  const [messages, setMessages] = useState([])
+  const [input, setInput]       = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const scrollRef = useRef(null)
 
-  // ✅ Force strict boolean evaluation
-  const ready = Boolean(socket) && Boolean(user) && Boolean(user._id);
-
-  console.log('🔍 Full auth object:', auth);
-  console.log('📦 roomId:', roomId);
-  console.log('🙋‍♂️ user._id:', user?.userId || user?._id);
-  console.log('🧠 doctorId:', doctorId);
-  console.log('🩺 patientId:', patientId);
-  console.log('✅ Ready status updated:', ready);
-
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
-
+  // A) Load past messages once
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    fetch(`/api/chat/rooms/${roomId}/messages`)
+      .then(res => res.json())
+      .then(setMessages)
+      .catch(console.error)
+  }, [roomId])
 
+  // B) Auto-scroll
   useEffect(() => {
-    if (!ready) return;
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
-    console.log('🚀 Emitting joinRoom with:', { roomId });
-    socket.emit('joinRoom', { roomId });
+  // C) Join & subscribe live events
+  useEffect(() => {
+    if (!ready) return
 
-    const handleMessage = (msg) => setMessages((prev) => [...prev, msg]);
-    const handleTyping = ({ userId }) => {
-      if (userId !== user._id) setIsTyping(true);
-    };
-    const handleStopTyping = ({ userId }) => {
-      if (userId !== user._id) setIsTyping(false);
-    };
-    const handleReconnect = () => {
-      console.log('🔁 Reconnected — rejoining room:', roomId);
-      socket.emit('joinRoom', { roomId });
-    };
+    socket.emit('joinRoom', { roomId })
+    const addMsg      = msg => setMessages(prev => [...prev, msg])
+    const startTyping = ({ userId: who }) =>
+      who !== userId && setIsTyping(true)
+    const stopTyping  = ({ userId: who }) =>
+      who !== userId && setIsTyping(false)
+    const onReconnect = () =>
+      socket.emit('joinRoom', { roomId })
 
-    socket.on('chatMessage', handleMessage);
-    socket.on('userTyping', handleTyping);
-    socket.on('userStoppedTyping', handleStopTyping);
-    socket.on('connect', handleReconnect);
+    socket.on('chatMessage', addMsg)
+    socket.on('userTyping', startTyping)
+    socket.on('userStoppedTyping', stopTyping)
+    socket.on('connect', onReconnect)
 
     return () => {
-      socket.off('chatMessage', handleMessage);
-      socket.off('userTyping', handleTyping);
-      socket.off('userStoppedTyping', handleStopTyping);
-      socket.off('connect', handleReconnect);
-    };
-  }, [socket, user?._id, roomId, ready]);
-
-  const sendMessage = () => {
-    if (input.trim() && ready) {
-      socket.emit('chatMessage', {
-        roomId,
-        message: input,
-        senderId: user._id,
-        createdAt: new Date().toISOString(),
-      });
-      setInput('');
+      socket.off('chatMessage', addMsg)
+      socket.off('userTyping', startTyping)
+      socket.off('userStoppedTyping', stopTyping)
+      socket.off('connect', onReconnect)
     }
-  };
-
-  const handleTyping = () => {
-    if (ready) {
-      socket.emit('typing', { roomId, userId: user._id });
-      setTimeout(() => {
-        socket.emit('stopTyping', { roomId, userId: user._id });
-      }, 2000);
-    }
-  };
+  }, [socket, userId, roomId, ready])
 
   if (!ready) {
-    return (
-      <div className="max-w-2xl mx-auto p-4 text-center text-gray-600">
-        Authenticating... Preparing your chat session.
-      </div>
-    );
+    return <div className="p-4 text-center">Loading chat…</div>
+  }
+
+  // D) Send / typing handlers
+  const sendMessage = () => {
+    if (!input.trim()) return
+    socket.emit('chatMessage', {
+      roomId,
+      message:  input,
+      senderId: userId,
+      createdAt:new Date().toISOString(),
+    })
+    setInput('')
+  }
+
+  let timeoutId
+  const handleType = e => {
+    setInput(e.target.value)
+    socket.emit('typing', { roomId, userId })
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(
+      () => socket.emit('stopTyping', { roomId, userId }),
+      2000
+    )
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-semibold text-center mb-4">
-        Doctor–Patient Live Chat
-      </h2>
+    <div className="chat-panel max-w-2xl mx-auto p-4 bg-white shadow rounded">
+      {/* ← Back to Dashboard */}
+      <button
+        onClick={() => navigate('/dashboard')}
+        // className="mb-4 text-blue-600 hover:underline"
+        className="btn-go back text-white-800 px-2 py-2 bg-blue-300 rounded hover:bg-purple-400"
+      >
+        ↩️ Back to Dashboard
+      </button>
 
-      <div className="h-64 overflow-y-auto border rounded p-2 mb-2">
-        {messages.map((msg, i) => (
+      <h2 className="text-center mb-4">Doctor–Patient Live Chat</h2>
+
+      <div className="messages h-74 bg-yellow-100 overflow-auto border p-2 mb-2">
+        {messages.map((m, i) => (
           <div
             key={i}
-            className={`p-2 rounded mb-2 max-w-[80%] ${
-              msg.senderId === user._id
-                ? 'ml-auto bg-blue-100 text-right'
-                : 'mr-auto bg-gray-100 text-left'
-            }`}
+            className={`msg ${m.senderId === userId ? 'mine' : 'theirs'}`}
           >
-            <p className="text-sm">{msg.message}</p>
-            <p className="text-xs text-gray-500 mt-1">
-              {msg.createdAt
-                ? new Date(msg.createdAt).toLocaleTimeString()
-                : 'Just now'}
-            </p>
+            <p>{m.message}</p>
+            <small>{new Date(m.createdAt).toLocaleTimeString()}</small>
           </div>
         ))}
-        {isTyping && (
-          <p className="italic text-sm text-gray-500">Typing...</p>
-        )}
-        <div ref={messagesEndRef} />
+        {isTyping && <p className="italic">Typing…</p>}
+        <div ref={scrollRef} />
       </div>
 
       <div className="flex gap-2">
         <input
           value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            handleTyping();
-          }}
-          placeholder="Type your message..."
+          onChange={handleType}
+          placeholder="Type a message…"
           className="flex-grow border p-2 rounded"
         />
         <button
           onClick={sendMessage}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="btn-send px-4 py-2 bg-green-300 rounded hover:bg-green-400"
         >
           Send
         </button>
       </div>
     </div>
-  );
+  )
 }

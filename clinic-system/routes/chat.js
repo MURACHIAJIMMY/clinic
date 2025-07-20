@@ -1,8 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const chatController = require('../controllers/chatController');
+const express = require('express')
+const router = express.Router()
+const {
+  saveMessage,      // for Socket integration
+  getRoomMessages
+} = require('../controllers/chatController')
 
-// POST endpoint for manual room creation
-router.post('/chat-room', chatController.createChatRoom);
+// GET /api/chat/rooms/:roomId/messages
+router.get('/rooms/:roomId/messages', getRoomMessages)
 
-module.exports = router;
+module.exports = router

@@ -1,43 +1,41 @@
+// src/context/SocketContext.jsx
 
+import { createContext, useEffect, useRef } from 'react'
+import { io } from 'socket.io-client'
+import useAuth from '@/hooks/useAuth'
 
-import { createContext, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
-import useAuth from '@/hooks/useAuth';
+// 1) Create the context
+const SocketContext = createContext(null)
 
-const SocketContext = createContext();
-
-export const SocketProvider = ({ children }) => {
-  const { user } = useAuth();
-  const socketRef = useRef(null);
+// 2) Provider component
+export function SocketProvider({ children }) {
+  const auth = useAuth()
+  const user = auth?.user ?? auth
+  const userId = user?._id || user?.id
+  const socketRef = useRef(null)
 
   useEffect(() => {
-    if (user && !socketRef.current) {
+    if (userId && !socketRef.current) {
       socketRef.current = io('http://localhost:5000', {
-        query: { userId: user._id, role: user.role },
-      });
-
-      socketRef.current.on('connect', () => {
-        console.log('🧠 Socket connected with ID:', socketRef.current.id);
-      });
-
-      if (user.role === 'doctor') {
-        socketRef.current.emit('doctorOnline', { doctorId: user._id });
-      }
+        query: { userId, role: user.role }
+      })
+      socketRef.current.on('connect', () =>
+        console.log('🧠 Socket connected:', socketRef.current.id)
+      )
     }
-
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        console.log('🧹 Socket disconnected');
-        socketRef.current = null;
-      }
-    };
-    }, [user]);
-  
-    return (
-      <SocketContext.Provider value={socketRef.current}>
-        {children}
-      </SocketContext.Provider>
-    );
-  };
- export default SocketProvider;
+      socketRef.current?.disconnect()
+      socketRef.current = null
+      console.log('🧹 Socket disconnected')
+    }
+  }, [userId, user.role])
+
+  return (
+    <SocketContext.Provider value={socketRef.current}>
+      {children}
+    </SocketContext.Provider>
+  )
+}
+
+// 3) Default export so "import SocketContext from '…'" works
+export default SocketContext
