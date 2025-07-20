@@ -127,5 +127,9 @@ router.get('/', protect, async (req, res) => {
     res.status(500).json({ message: 'Server error fetching doctors' });
   }
 });
+const { getAllDoctors } = require('../controllers/doctorController');
+// Allow patients (and auth’d users) to browse doctors
+router.get('/', protect, getAllDoctors);
+
 
 module.exports = router;
