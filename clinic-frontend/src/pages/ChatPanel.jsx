@@ -94,7 +94,7 @@ export default function ChatPanel() {
       <button
         onClick={() => navigate('/dashboard')}
         // className="mb-4 text-blue-600 hover:underline"
-        className="btn-go back text-white-800 px-2 py-2 bg-blue-300 rounded hover:bg-purple-400"
+        className="btn-go back text-black px-2 py-2 bg-blue-300 rounded hover:bg-purple-400"
       >
         ↩️ Back to Dashboard
       </button>
