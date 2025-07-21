@@ -24,6 +24,7 @@ export default function ChatPanel() {
 
   // A) Load past messages once
   useEffect(() => {
+    const API = import.meta.env.VITE_API_URL
     fetch(`/api/chat/rooms/${roomId}/messages`)
       .then(res => res.json())
       .then(setMessages)

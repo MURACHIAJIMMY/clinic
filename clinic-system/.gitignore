@@ -1,0 +1,11 @@
+# Local environment variables
+.env
+
+# Node modules
+node_modules/
+
+# Production build (Vite)
+dist/
+
+# Uploaded files, if any
+/uploads
