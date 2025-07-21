@@ -10,7 +10,7 @@ const { sendResetEmailHelper } = require('../utils/emailHelper');
 
 // 🔐 Generate JWT Token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '360d' });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 // ✅ Register New User
