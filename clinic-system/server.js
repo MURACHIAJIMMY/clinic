@@ -53,11 +53,11 @@ console.log('🔗 Mounting authRoutes at /api/auth')
 app.use('/api/auth', authRoutes)
 console.log('✅ authRoutes mounted')
 
-app.use('/api/doctors',      doctorRoutes)
-app.use('/api/appointments',  appointmentRoutes)
-app.use('/api/users',        userRoutes)
-app.use('/api/patients',     patientRoutes)
-app.use('/api/chat',         chatRoutes)
+// app.use('/api/doctors',      doctorRoutes)
+// app.use('/api/appointments',  appointmentRoutes)
+// app.use('/api/users',        userRoutes)
+// app.use('/api/patients',     patientRoutes)
+// app.use('/api/chat',         chatRoutes)
 
 // 8) Health & Test endpoints
 app.get('/',   (_req, res) => res.send('Clinic System API is running…'))
