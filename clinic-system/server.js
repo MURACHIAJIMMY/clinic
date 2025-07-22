@@ -10,11 +10,11 @@ const path    = require('path')
 
 const connectDB      = require('./config/db')
 const authRoutes     = require('./routes/authRoutes')
-const doctorRoutes   = require('./routes/doctorRoutes')
-const appointmentRoutes = require('./routes/appointmentRoutes')
-const userRoutes     = require('./routes/userRoutes')
-const patientRoutes  = require('./routes/patientRoutes')
-const chatRoutes     = require('./routes/chat')
+// const doctorRoutes   = require('./routes/doctorRoutes')
+// const appointmentRoutes = require('./routes/appointmentRoutes')
+// const userRoutes     = require('./routes/userRoutes')
+// const patientRoutes  = require('./routes/patientRoutes')
+// const chatRoutes     = require('./routes/chat')
 
 // 1) Connect to MongoDB
 connectDB(process.env.MONGODB_URI)
