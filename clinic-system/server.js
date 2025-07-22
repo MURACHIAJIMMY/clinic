@@ -1,5 +1,6 @@
 // server.js
 require('dotenv').config()               // Load .env first
+console.log('🦄 DEBUG: this is the updated server.js being executed')
 
 const express = require('express')
 const http    = require('http')
