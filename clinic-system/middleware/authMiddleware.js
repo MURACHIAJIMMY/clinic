@@ -1,56 +1,5 @@
 
 
-// // middleware/authMiddleware.js
-// const jwt = require('jsonwebtoken');
-// const User = require('../Models/userModel');
-
-// // 🔐 Middleware to authenticate users via JWT
-// const protect = async (req, res, next) => {
-//   let token;
-
-//   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-//     try {
-//       token = req.headers.authorization.split(' ')[1];
-//       console.log('🪪 Incoming token:', token);
-
-//       // ✅ Decode the token
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//       console.log('🔓 Decoded token payload:', decoded);
-
-//       // ✅ Fetch the user using decoded ID
-//       const user = await User.findById(decoded.id).select('-password');
-//       console.log('👤 Retrieved user:', user);
-
-//       if (!user) {
-//         return res.status(401).json({ message: 'User not found in database' });
-//       }
-
-//       req.user = user; // Attach user to request
-//       next();
-//     } catch (error) {
-//       console.error('❌ Token validation error:', error.message);
-//       return res.status(401).json({ message: 'Invalid or expired token' });
-//     }
-//   } else {
-//     return res.status(401).json({ message: 'Authorization token missing' });
-//   }
-// };
-
-// // 🛡 Middleware to allow only doctors
-// const doctorAccess = (req, res, next) => {
-//   if (!req.user) {
-//     return res.status(401).json({ message: 'User not authenticated' });
-//   }
-
-//   if (req.user.role !== 'doctor') {
-//     return res.status(403).json({ message: 'Access denied: doctor role required' });
-//   }
-
-//   next();
-// };
-
-// module.exports = { protect, doctorAccess };
-
 
 const jwt = require('jsonwebtoken');
 const User = require('../Models/userModel');

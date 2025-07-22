@@ -1,16 +1,3 @@
-// const Patient = require('../Models/patientModel');
-
-// const getPatients = async (req, res) => {
-//   try {
-//     const patients = await Patient.find().sort({ createdAt: -1 });
-//     res.status(200).json(patients);
-//   } catch (err) {
-//     res.status(500).json({ message: 'Failed to fetch patients' });
-//   }
-// };
-
-// module.exports = { getPatients };
-
 
 const Patient = require('../Models/patientModel');
 
