@@ -1,0 +1,27 @@
+# root .gitignore (in A:/clinic-sys)
+# Local envs
+.env
+.env.local
+.env.*.local
+
+# Node modules (including our sub-folder)
+node_modules/
+clinic-system/node_modules/
+
+# Lockfiles / pnpm store
+pnpm-lock.yaml
+package-lock.json
+.pnpm-store/
+
+# Build outputs
+dist/
+clinic-system/dist/
+
+# Uploaded assets
+uploads/
+clinic-system/uploads/
+
+# IDE / OS files
+.DS_Store
+.vscode/
+npm-debug.log*
