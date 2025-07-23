@@ -1,84 +1,100 @@
-// server.js
-require('dotenv').config()               // Load .env first
-console.log('🦄 DEBUG: this is the updated server.js being executed')
+// // server.js
+// require('dotenv').config()               // Load .env first
+// console.log('🦄 DEBUG: this is the updated server.js being executed')
 
-const express = require('express')
-const http    = require('http')
-const { Server } = require('socket.io')
-const cors    = require('cors')
-const path    = require('path')
+// const express = require('express')
+// const http    = require('http')
+// const { Server } = require('socket.io')
+// const cors    = require('cors')
+// const path    = require('path')
 
-const connectDB      = require('./config/db')
-const authRoutes     = require('./routes/authRoutes')
-// const doctorRoutes   = require('./routes/doctorRoutes')
-// const appointmentRoutes = require('./routes/appointmentRoutes')
-// const userRoutes     = require('./routes/userRoutes')
-// const patientRoutes  = require('./routes/patientRoutes')
-// const chatRoutes     = require('./routes/chat')
+// const connectDB      = require('./config/db')
+// const authRoutes     = require('./routes/authRoutes')
+// // const doctorRoutes   = require('./routes/doctorRoutes')
+// // const appointmentRoutes = require('./routes/appointmentRoutes')
+// // const userRoutes     = require('./routes/userRoutes')
+// // const patientRoutes  = require('./routes/patientRoutes')
+// // const chatRoutes     = require('./routes/chat')
 
-// 1) Connect to MongoDB
-connectDB(process.env.MONGODB_URI)
+// // 1) Connect to MongoDB
+// connectDB(process.env.MONGODB_URI)
 
-// 2) Create Express + HTTP server
-const app    = express()
-const server = http.createServer(app)
+// // 2) Create Express + HTTP server
+// const app    = express()
+// const server = http.createServer(app)
 
-// 3) Configure CORS once, passing only middleware functions
-const CLIENT_URL = process.env.CLIENT_URL        // e.g. https://clinic-booking-br9y.onrender.com
-const corsOptions = {
-  origin:         CLIENT_URL,
-  credentials:    true,
-  methods:        ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
-}
+// // 3) Configure CORS once, passing only middleware functions
+// const CLIENT_URL = process.env.CLIENT_URL        // e.g. https://clinic-booking-br9y.onrender.com
+// const corsOptions = {
+//   origin:         CLIENT_URL,
+//   credentials:    true,
+//   methods:        ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+//   allowedHeaders: ['Content-Type','Authorization']
+// }
 
-// register CORS
-app.use(cors(corsOptions))
-// handle preflight
-app.options('*', cors(corsOptions))
+// // register CORS
+// app.use(cors(corsOptions))
+// // handle preflight
+// app.options('*', cors(corsOptions))
 
-// 4) Body parser
-app.use(express.json())
+// // 4) Body parser
+// app.use(express.json())
 
-// 5) Request logger
-app.use((req, res, next) => {
-  console.log(`🔎 ${req.method} ${req.url}`, req.body)
-  next()
-})
+// // 5) Request logger
+// app.use((req, res, next) => {
+//   console.log(`🔎 ${req.method} ${req.url}`, req.body)
+//   next()
+// })
 
-// 6) Static uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+// // 6) Static uploads folder
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
-// // 7) Mount your routers on literal paths only
-// console.log('🔗 Mounting authRoutes at /api/auth')
-app.use('/api/auth', authRoutes)
-// console.log('✅ authRoutes mounted')
+// // // 7) Mount your routers on literal paths only
+// // console.log('🔗 Mounting authRoutes at /api/auth')
+// app.use('/api/auth', authRoutes)
+// // console.log('✅ authRoutes mounted')
 
-// app.use('/api/doctors',      doctorRoutes)
-// app.use('/api/appointments',  appointmentRoutes)
-// app.use('/api/users',        userRoutes)
-// app.use('/api/patients',     patientRoutes)
-// app.use('/api/chat',         chatRoutes)
+// // app.use('/api/doctors',      doctorRoutes)
+// // app.use('/api/appointments',  appointmentRoutes)
+// // app.use('/api/users',        userRoutes)
+// // app.use('/api/patients',     patientRoutes)
+// // app.use('/api/chat',         chatRoutes)
 
-// 8) Health & Test endpoints
-app.get('/',   (_req, res) => res.send('Clinic System API is running…'))
-app.post('/test', (_req, res) => res.json({ message: 'Test POST request received!' }))
+// // 8) Health & Test endpoints
+// app.get('/',   (_req, res) => res.send('Clinic System API is running…'))
+// app.post('/test', (_req, res) => res.json({ message: 'Test POST request received!' }))
 
-// 9) Global error handler
-app.use((err, _req, res, _next) => {
-  console.error('❌ Express error:', err)
-  res.status(err.statusCode || 500).json({ message: err.message || 'Internal Server Error' })
-})
+// // 9) Global error handler
+// app.use((err, _req, res, _next) => {
+//   console.error('❌ Express error:', err)
+//   res.status(err.statusCode || 500).json({ message: err.message || 'Internal Server Error' })
+// })
 
-// 10) Initialize Socket.IO with same CORS
-const io = new Server(server, { cors: corsOptions })
-io.on('connection', (socket) => {
-  console.log('🔌 Socket connected:', socket.id)
-  // … your socket handlers …
-})
+// // 10) Initialize Socket.IO with same CORS
+// const io = new Server(server, { cors: corsOptions })
+// io.on('connection', (socket) => {
+//   console.log('🔌 Socket connected:', socket.id)
+//   // … your socket handlers …
+// })
 
-// 11) Start server
-const PORT = process.env.PORT || 5000
+// // 11) Start server
+// const PORT = process.env.PORT || 5000
+// server.listen(PORT, () => {
+//   console.log(`✅ Server + Socket.IO running on port ${PORT} 🚀`)
+// })
+
+require('dotenv').config();
+console.log('🦄 MINIMAL SERVER STARTING');
+
+const express = require('express');
+const http    = require('http');
+
+const app    = express();
+const server = http.createServer(app);
+
+// No app.use, no routes, no middleware
+
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`✅ Server + Socket.IO running on port ${PORT} 🚀`)
-})
+  console.log(`✅ Listening on port ${PORT}`);
+});
