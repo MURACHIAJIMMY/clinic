@@ -53,26 +53,26 @@
 
 // module.exports = router
 
-const express = require('express')
+const express = require('express');
 const {
   registerUser,
   loginUser,
   sendResetEmail,
   resetPassword
-} = require('../controllers/authController')
+} = require('../controllers/authController');
 
-console.log('🚀 authRoutes.js loaded — no routes attached')
+console.log('🚀 authRoutes.js loaded – registering /register, /login, /forgot-password, /reset/:token');
 
-const router = express.Router()
+const router = express.Router();
 
 // Helper to wrap async handlers
 const asyncHandler = (fn) => (req, res, next) =>
-  Promise.resolve(fn(req, res, next)).catch(next)
+  Promise.resolve(fn(req, res, next)).catch(next);
 
-// Temporarily disable all routes to see if crash goes away
-// router.post('/register',      asyncHandler(registerUser))
-// router.post('/login',         asyncHandler(loginUser))
-// router.post('/forgot-password', asyncHandler(sendResetEmail))
-// router.post('/reset/:token',  asyncHandler(resetPassword))
+// Re-enable signup & login routes
+router.post('/register',      asyncHandler(registerUser));
+router.post('/login',         asyncHandler(loginUser));
+router.post('/forgot-password', asyncHandler(sendResetEmail));
+router.post('/reset/:token',    asyncHandler(resetPassword));
 
-module.exports = router
+module.exports = router;
