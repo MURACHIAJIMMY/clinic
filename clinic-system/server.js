@@ -51,7 +51,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // // 7) Mount your routers on literal paths only
 // console.log('🔗 Mounting authRoutes at /api/auth')
-// app.use('/api/auth', authRoutes)
+app.use('/api/auth', authRoutes)
 // console.log('✅ authRoutes mounted')
 
 // app.use('/api/doctors',      doctorRoutes)
