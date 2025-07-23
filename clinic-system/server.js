@@ -84,17 +84,21 @@
 // })
 
 require('dotenv').config();
-console.log('🦄 MINIMAL SERVER STARTING');
+console.log('🦄 STEP 1: CORS + JSON');
 
+// Step 1 imports
 const express = require('express');
-const http    = require('http');
+const cors    = require('cors');
 
 const app    = express();
-const server = http.createServer(app);
 
-// No app.use, no routes, no middleware
+// CORS (only counting these lines for now)
+const CLIENT_URL = process.env.CLIENT_URL;
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.options('*', cors({ origin: CLIENT_URL, credentials: true }));
+
+// Body parser
+app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`✅ Listening on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ STEP 1 listening on port ${PORT}`));
