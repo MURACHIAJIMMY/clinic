@@ -96,7 +96,7 @@ const app = express();
 // CORS
 const CLIENT_URL = process.env.CLIENT_URL;
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
-app.options('/api/*', cors({ origin: CLIENT_URL, credentials: true }));
+// app.options('/api/*', cors({ origin: CLIENT_URL, credentials: true }));
 
 // Body parser
 app.use(express.json());
