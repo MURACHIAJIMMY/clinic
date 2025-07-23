@@ -84,21 +84,30 @@
 // })
 
 require('dotenv').config();
-console.log('🦄 STEP 1: CORS + JSON');
+console.log('🦄 STEP 2: Static + Health');
 
-// Step 1 imports
+// Imports
 const express = require('express');
 const cors    = require('cors');
+const path    = require('path');
 
-const app    = express();
+const app = express();
 
-// CORS (only counting these lines for now)
+// CORS
 const CLIENT_URL = process.env.CLIENT_URL;
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
-// app.options('*', cors({ origin: CLIENT_URL, credentials: true }));
+app.options('/api/*', cors({ origin: CLIENT_URL, credentials: true }));
 
 // Body parser
 app.use(express.json());
 
+// Static uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Health check
+app.get('/', (_req, res) => res.send('Clinic System API is running…'));
+app.post('/test', (_req, res) => res.json({ message: 'Test POST received!' }));
+
+// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ STEP 1 listening on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ STEP 2 listening on port ${PORT}`));
