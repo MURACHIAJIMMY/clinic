@@ -83,41 +83,46 @@
 //   console.log(`✅ Server + Socket.IO running on port ${PORT} 🚀`)
 // })
 
+// server.js
 require('dotenv').config();
-console.log('🦄 STEP 3: Auth routes');
+const express   = require('express');
+const cors      = require('cors');
+const path      = require('path');
+const connectDB = require('./config/db');       // your DB helper
+const authRoutes= require('./routes/authRoutes');
 
-// Imports
-const express = require('express');
-const cors    = require('cors');
-const path    = require('path');
+const startServer = async () => {
+  // 1) Connect to MongoDB
+  console.log('🔌 Connecting to MongoDB…');
+  await connectDB(process.env.MONGODB_URI);
 
-const authRoutes = require('./routes/authRoutes');
+  // 2) Create Express app
+  console.log('🦄 STEP 3: Auth routes');
+  const app = express();
 
-const app = express();
+  // 3) CORS + JSON
+  const CLIENT_URL = process.env.CLIENT_URL;
+  app.use(cors({ origin: CLIENT_URL, credentials: true }));
+  app.use(express.json());
 
-// CORS
-const CLIENT_URL = process.env.CLIENT_URL;
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
-// (You can uncomment this if you need explicit preflight on /api/*)
-// app.options('/api/*', cors({ origin: CLIENT_URL, credentials: true }));
+  // 4) Static + Health
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  app.get('/',   (_req, res) => res.send('Clinic System API is running…'));
+  app.post('/test', (_req, res) => res.json({ message: 'Test POST received!' }));
 
-// Body parser
-app.use(express.json());
+  // 5) Mount authRoutes
+  console.log('🔗 Mounting authRoutes at /api/auth');
+  app.use('/api/auth', authRoutes);
+  console.log('✅ authRoutes mounted');
 
-// Static uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  // 6) Finally start listening
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () =>
+    console.log(`✅ STEP 3 listening on port ${PORT}`)
+  );
+};
 
-// Health check
-app.get('/', (_req, res) => res.send('Clinic System API is running…'));
-app.post('/test', (_req, res) => res.json({ message: 'Test POST received!' }));
-
-// Mount auth routes
-console.log('🔗 Mounting authRoutes at /api/auth');
-app.use('/api/auth', authRoutes);
-console.log('✅ authRoutes mounted');
-
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`✅ STEP 3 listening on port ${PORT}`)
-);
+startServer().catch(err => {
+  console.error('❌ Failed to start server:', err);
+  process.exit(1);
+});
