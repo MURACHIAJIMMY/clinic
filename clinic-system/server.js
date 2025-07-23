@@ -84,18 +84,21 @@
 // })
 
 require('dotenv').config();
-console.log('🦄 STEP 2: Static + Health');
+console.log('🦄 STEP 3: Auth routes');
 
 // Imports
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 
+const authRoutes = require('./routes/authRoutes');
+
 const app = express();
 
 // CORS
 const CLIENT_URL = process.env.CLIENT_URL;
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
+// (You can uncomment this if you need explicit preflight on /api/*)
 // app.options('/api/*', cors({ origin: CLIENT_URL, credentials: true }));
 
 // Body parser
@@ -108,6 +111,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/', (_req, res) => res.send('Clinic System API is running…'));
 app.post('/test', (_req, res) => res.json({ message: 'Test POST received!' }));
 
+// Mount auth routes
+console.log('🔗 Mounting authRoutes at /api/auth');
+app.use('/api/auth', authRoutes);
+console.log('✅ authRoutes mounted');
+
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ STEP 2 listening on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`✅ STEP 3 listening on port ${PORT}`)
+);
