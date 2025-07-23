@@ -83,7 +83,7 @@
 //   console.log(`✅ Server + Socket.IO running on port ${PORT} 🚀`)
 // })
 
-  // server.js
+// server.js
  require('dotenv').config();
  const express           = require('express');
  const cors              = require('cors');
@@ -92,8 +92,9 @@
  const authRoutes        = require('./routes/authRoutes');
  const doctorRoutes      = require('./routes/doctorRoutes');
  const appointmentRoutes = require('./routes/appointmentRoutes');
-const patientRoutes     = require('./routes/patientRoutes');
-const chatRoutes        = require('./routes/chat');
+ const patientRoutes     = require('./routes/patientRoutes');
+ const chatRoutes        = require('./routes/chat');
+const userRoutes        = require('./routes/userRoutes');   // ← import
 
  const startServer = async () => {
    // 1) Connect to MongoDB
@@ -101,8 +102,8 @@ const chatRoutes        = require('./routes/chat');
    await connectDB(process.env.MONGODB_URI);
 
    // 2) Create Express app
--  console.log('🦄 STEP 4: Auth, Doctor & Appointment routes');
-+  console.log('🦄 STEP 6: Auth, Doctor, Appointment, Patient & Chat routes');
+  console.log('🦄 STEP 6: Auth, Doctor, Appointment, Patient & Chat routes');
+  console.log('🦄 STEP 7: Auth, Doctor, Appointment, Patient, Chat & User routes');
    const app = express();
 
    // 3) CORS + JSON
@@ -130,17 +131,22 @@ const chatRoutes        = require('./routes/chat');
    app.use('/api/appointments', appointmentRoutes);
    console.log('✅ appointmentRoutes mounted');
 
-+  // 8) Mount patientRoutes
-+  console.log('🔗 Mounting patientRoutes at /api/patients');
-+  app.use('/api/patients', patientRoutes);
-+  console.log('✅ patientRoutes mounted');
-+
-+  // 9) Mount chatRoutes
-+  console.log('🔗 Mounting chatRoutes at /api/chat');
-+  app.use('/api/chat', chatRoutes);
-+  console.log('✅ chatRoutes mounted');
+   // 8) Mount patientRoutes
+   console.log('🔗 Mounting patientRoutes at /api/patients');
+   app.use('/api/patients', patientRoutes);
+   console.log('✅ patientRoutes mounted');
 
-   // 10) Start listening
+   // 9) Mount chatRoutes
+   console.log('🔗 Mounting chatRoutes at /api/chat');
+   app.use('/api/chat', chatRoutes);
+   console.log('✅ chatRoutes mounted');
+
+ // 10) Mount userRoutes
+  console.log('🔗 Mounting userRoutes at /api/users');
+  app.use('/api/users', userRoutes);
+  console.log('✅ userRoutes mounted');
+
+   // 11) Start listening
    const PORT = process.env.PORT || 5000;
    app.listen(PORT, () =>
      console.log(`✅ Server listening on port ${PORT}`)
