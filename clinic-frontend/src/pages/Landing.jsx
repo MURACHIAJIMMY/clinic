@@ -72,30 +72,37 @@ export default function Landing() {
       </section>
 
       {/* About Us */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
-          <img
-            src="/clinic-team.jpg"
-            alt="JM Clinics Team"
-            className="w-full md:w-1/2 rounded-lg shadow-lg object-cover h-80"
-          />
-          <div>
-            <h2 className="text-3xl font-semibold mb-4">About JM Clinics</h2>
-            <p className="mb-4">
-              At JM Clinics, we blend state-of-the-art technology with personalized care. Our multidisciplinary team works together to bring you the highest standard of medical services in a warm, welcoming environment.
-            </p>
-            <p className="mb-6">
-              Whether you need a general check-up, specialized consultation, or emergency care, our doors are always open. Trust us with your health ― you’re in expert hands.
-            </p>
-            <button
-              onClick={cta}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded shadow transition"
-            >
-              Get Started
-            </button>
-          </div>
-        </div>
-      </section>
+<section className="py-16 bg-gray-50">
+  <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
+
+    {/* Team Image */}
+    <img
+      src="/clinic-team.jpg"
+      alt="JM Clinics Team"
+      className="w-full md:w-1/2 rounded-lg shadow-lg object-cover h-96"
+    />
+
+    {/* Text Block */}
+    <div className="md:w-1/2 space-y-4">
+      <h2 className="text-3xl font-semibold mb-4">About JM Clinics</h2>
+      <p>
+        At JM Clinics, we blend state-of-the-art technology with personalized care. 
+        Our multidisciplinary team works together to bring you the highest standard 
+        of medical services in a warm, welcoming environment.
+      </p>
+      <p>
+        Whether you need a general check-up, specialized consultation, or emergency 
+        care, our doors are always open. Trust us with your health ― you’re in expert hands.
+      </p>
+      <button
+        onClick={cta}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded shadow transition"
+      >
+        Get Started
+      </button>
+    </div>
+  </div>
+</section>
 
       {/* Contact & Connect */}
       <section className="py-16 bg-white">
