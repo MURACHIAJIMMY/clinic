@@ -112,7 +112,14 @@ export default function BookAppointment() {
 
       <div className="max-w-6xl mx-auto mt-24 flex flex-col lg:flex-row gap-8 px-4">
         {/* Sidebar */}
-        
+        <aside className="w-full lg:w-60 flex flex-col gap-4 p-4 bg-white bg-opacity-90 rounded-lg shadow-lg">
+          {/* <Button
+            onClick={() => navigate('/appointments/upcoming')}
+            className="w-full py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          >
+            Upcoming Appointments
+          </Button> */}
+
           <Button
             onClick={() => navigate('/doctors')}
             className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -126,14 +133,6 @@ export default function BookAppointment() {
           >
             Appointment History
           </Button>
-          <aside className="w-full lg:w-60 flex flex-col gap-4 p-4 bg-white bg-opacity-90 rounded-lg shadow-lg">
-          <Button
-            onClick={() => navigate('/appointments/upcoming')}
-            className="w-full py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            Upcoming Appointments
-          </Button>
-
 
           <Button
             onClick={() => navigate('/profile')}
