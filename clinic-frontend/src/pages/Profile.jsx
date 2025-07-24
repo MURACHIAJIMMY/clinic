@@ -155,7 +155,6 @@
 //     </AppLayout>
 //   );
 // }
-
 // src/pages/Profile.jsx
 import { useEffect, useState } from 'react'
 import AppLayout from '@/components/ui/AppLayout'
@@ -248,6 +247,9 @@ export default function Profile() {
     )
   }
 
+  // Clean up the path to avoid double "uploads/" prefix
+  const cleanImagePath = currentImage.replace(/^\/?uploads\//, '')
+
   return (
     <AppLayout>
       <div className="max-w-md mx-auto flex flex-col items-center text-center space-y-6">
@@ -256,7 +258,7 @@ export default function Profile() {
         {currentImage ? (
           <img
             key={currentImage}
-            src={`${BACKEND_URL}/uploads/${currentImage}`}
+            src={`${BACKEND_URL}/uploads/${cleanImagePath}`}
             alt="Profile"
             onError={(e) => {
               console.warn(
