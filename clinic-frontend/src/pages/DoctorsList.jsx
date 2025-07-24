@@ -153,7 +153,7 @@ export default function DoctorList() {
       <div className="max-w-6xl mx-auto mb-6">
         <Button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center space-x-2 bg-white shadow px-4 py-2 rounded hover:bg-gray-50"
+          className="inline-flex items-center space-x-2 bg-blue shadow px-4 py-2 rounded hover:bg-gray-50"
         >
           <FiArrowLeft size={18} />
           <span>Back to Booking</span>
