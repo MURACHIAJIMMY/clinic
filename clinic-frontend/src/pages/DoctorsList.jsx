@@ -1,6 +1,6 @@
 
 // // src/pages/DoctorList.jsx
-// import { useState, useEffect } from 'react'
+// import React, { useState, useEffect } from 'react'
 // import { Navigate, useNavigate } from 'react-router-dom'
 // import { FiArrowLeft } from 'react-icons/fi'
 // import { toast } from 'sonner'
@@ -13,7 +13,7 @@
 //   const stored   = localStorage.getItem('user')
 //   const user     = stored ? JSON.parse(stored) : null
 
-//   // Determine backend URL
+//   // Backend base URL from env or fallback
 //   const BACKEND_URL =
 //     import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5000'
 
@@ -21,18 +21,19 @@
 //   const [loading, setLoading] = useState(true)
 
 //   useEffect(() => {
-//     api.get('/doctors')
+//     api
+//       .get('/doctors')
 //       .then(res => setDoctors(res.data))
 //       .catch(() => toast.error('Failed to load doctors'))
 //       .finally(() => setLoading(false))
 //   }, [])
 
-//   // Redirect to login if unauthenticated
+//   // If not logged in, redirect to login
 //   if (!user) {
 //     return <Navigate to="/login" replace />
 //   }
 
-//   // Show a loading state while fetching
+//   // Show spinner/text while loading
 //   if (loading) {
 //     return (
 //       <div className="min-h-screen flex items-center justify-center">
@@ -43,11 +44,11 @@
 
 //   return (
 //     <div className="min-h-screen bg-gray-100 px-4 py-10">
-//       {/* Back button */}
+//       {/* Back to Booking button */}
 //       <div className="max-w-6xl mx-auto mb-6">
 //         <Button
 //           onClick={() => navigate(-1)}
-//           className="inline-flex items-center space-x-2 bg-white shadow px-4 py-2 rounded hover:bg-gray-50"
+//           className="inline-flex items-center space-x-2 bg-blue shadow px-4 py-2 rounded hover:bg-gray-50"
 //         >
 //           <FiArrowLeft size={18} />
 //           <span>Back to Booking</span>
@@ -55,14 +56,12 @@
 //       </div>
 
 //       {/* Page title */}
-//       <h1 className="text-3xl font-bold text-center mb-8">
-//         Our Doctors
-//       </h1>
+//       <h1 className="text-3xl font-bold text-center mb-8">Our Doctors</h1>
 
 //       {/* Doctors grid */}
 //       <div className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 //         {doctors.map((doc) => {
-//           // Normalize the filename by stripping any leading "uploads/" 
+//           // Strip any leading uploads/ from the stored filename
 //           const filename = doc.profileImage?.replace(/^\/?uploads\//, '') || ''
 //           const imgSrc = filename
 //             ? `${BACKEND_URL}/uploads/${filename}`
@@ -87,7 +86,8 @@
 //                   <strong>Name:</strong> {doc.name || 'Unnamed'}
 //                 </p>
 //                 <p>
-//                   <strong>Specialization:</strong> {doc.specialization || 'Not specified'}
+//                   <strong>Specialization:</strong>{' '}
+//                   {doc.specialization || 'Not specified'}
 //                 </p>
 //                 <p>
 //                   <strong>Email:</strong> {doc.email || '—'}
@@ -118,7 +118,6 @@ export default function DoctorList() {
   const stored   = localStorage.getItem('user')
   const user     = stored ? JSON.parse(stored) : null
 
-  // Backend base URL from env or fallback
   const BACKEND_URL =
     import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5000'
 
@@ -133,12 +132,10 @@ export default function DoctorList() {
       .finally(() => setLoading(false))
   }, [])
 
-  // If not logged in, redirect to login
   if (!user) {
     return <Navigate to="/login" replace />
   }
 
-  // Show spinner/text while loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -153,7 +150,7 @@ export default function DoctorList() {
       <div className="max-w-6xl mx-auto mb-6">
         <Button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center space-x-2 bg-blue shadow px-4 py-2 rounded hover:bg-gray-50"
+          className="inline-flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           <FiArrowLeft size={18} />
           <span>Back to Booking</span>
@@ -166,7 +163,6 @@ export default function DoctorList() {
       {/* Doctors grid */}
       <div className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {doctors.map((doc) => {
-          // Strip any leading uploads/ from the stored filename
           const filename = doc.profileImage?.replace(/^\/?uploads\//, '') || ''
           const imgSrc = filename
             ? `${BACKEND_URL}/uploads/${filename}`
@@ -184,15 +180,14 @@ export default function DoctorList() {
                   e.currentTarget.onerror = null
                   e.currentTarget.src = placeholder
                 }}
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-cover object-center"
               />
-              <div className="p-4 space-y-2">
+              <div className="p-4 space-y-2 bg-gradient-to-b from-green-100 to-green-200">
                 <p>
                   <strong>Name:</strong> {doc.name || 'Unnamed'}
                 </p>
                 <p>
-                  <strong>Specialization:</strong>{' '}
-                  {doc.specialization || 'Not specified'}
+                  <strong>Specialization:</strong> {doc.specialization || 'Not specified'}
                 </p>
                 <p>
                   <strong>Email:</strong> {doc.email || '—'}
