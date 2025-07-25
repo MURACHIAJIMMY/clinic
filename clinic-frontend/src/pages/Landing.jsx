@@ -2,9 +2,12 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
-  FaStethoscope,
-  FaHeartbeat,
   FaUserMd,
+  FaTooth,
+  FaHeartbeat,
+  FaChild,
+  FaBrain,
+  FaBone,
   FaPhoneAlt,
   FaMapMarkerAlt,
   FaWhatsapp,
@@ -118,32 +121,47 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features / Services */}
+      {/* Services */}
       <section id="services" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold mb-8">Why Choose JM Clinics?</h2>
-          <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 className="text-3xl font-semibold mb-8">Our Services</h2>
+          <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-4">
               <FaUserMd className="mx-auto text-5xl text-blue-500" />
-              <h3 className="text-xl font-semibold">Experienced Doctors</h3>
-              <p>Board-certified specialists with years of hands-on experience in every field of medicine.</p>
+              <h3 className="text-xl font-semibold">General Medicine</h3>
+              <p>Comprehensive primary care for all ages and conditions.</p>
             </div>
             <div className="space-y-4">
-              <FaStethoscope className="mx-auto text-5xl text-blue-500" />
-              <h3 className="text-xl font-semibold">Comprehensive Care</h3>
-              <p>From routine checkups to advanced diagnostics, we’ve got you covered.</p>
+              <FaTooth className="mx-auto text-5xl text-green-500" />
+              <h3 className="text-xl font-semibold">Dental Care</h3>
+              <p>Preventive, restorative, and cosmetic dentistry services.</p>
             </div>
             <div className="space-y-4">
-              <FaHeartbeat className="mx-auto text-5xl text-blue-500" />
-              <h3 className="text-xl font-semibold">Patient-Centered</h3>
-              <p>Your comfort and well-being are our top priority in every treatment plan.</p>
+              <FaHeartbeat className="mx-auto text-5xl text-red-500" />
+              <h3 className="text-xl font-semibold">Cardiology</h3>
+              <p>Advanced heart health diagnostics and treatments.</p>
+            </div>
+            <div className="space-y-4">
+              <FaChild className="mx-auto text-5xl text-yellow-500" />
+              <h3 className="text-xl font-semibold">Pediatrics</h3>
+              <p>Gentle, child-centered care from infancy through adolescence.</p>
+            </div>
+            <div className="space-y-4">
+              <FaBrain className="mx-auto text-5xl text-purple-500" />
+              <h3 className="text-xl font-semibold">Neurology</h3>
+              <p>Expert evaluation and management of nervous system disorders.</p>
+            </div>
+            <div className="space-y-4">
+              <FaBone className="mx-auto text-5xl text-indigo-500" />
+              <h3 className="text-xl font-semibold">Orthopedics</h3>
+              <p>Comprehensive bone, joint, and muscle care and rehabilitation.</p>
             </div>
           </div>
           <button
             onClick={cta}
             className="mt-10 bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-8 rounded-full shadow transition"
           >
-            Register & Book Now
+            Explore All Services
           </button>
         </div>
       </section>
@@ -234,8 +252,9 @@ export default function Landing() {
       {/* Footer */}
       <footer className="bg-gray-800 text-gray-300 py-6">
         <div className="max-w-6xl mx-auto px-4 text-center space-y-2">
-          <p>© {new Date().getFullYear()} JM Clinics. All rights reserved.</p>
-          <p>Developed by J.M Murachia</p>
+          <p>© {new Date().getFullYear()} JM Clinics. All rights
+            reserved.</p>
+          <p>Developed by J.M. Murachia</p>
         </div>
       </footer>
     </div>
