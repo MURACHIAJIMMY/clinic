@@ -1,7 +1,7 @@
-JM Clinics Full-Stack System
+**JM Clinics Full-Stack System**
 A tissue-thin landing page meets a robust backend and real-time chat. This repo powers JM Clinics’ marketing site and doctor–patient chat system built with React, Socket.IO, and Express.
 
-Table of Contents
+**Table of Contents**
 System Architecture
 
 Real-Time Communication
@@ -22,10 +22,10 @@ Contributing
 
 License
 
-System Architecture
+**System Architecture**
 JM Clinics is split into two main services:
 
-clinic-frontend
+**1. clinic-frontend**
 
 Built with Vite + React + Tailwind CSS
 
@@ -33,7 +33,7 @@ Hosts the marketing/booking site and doctor–patient chat UI
 
 Connects to backend REST APIs and the Socket.IO server
 
-clinic-system
+**2. clinic-system**
 
 Node.js + Express server
 
