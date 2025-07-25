@@ -2,6 +2,7 @@
 A tissue-thin landing page meets a robust backend and real-time chat. This repo powers JM Clinics’ marketing site and doctor–patient chat system built with React, Socket.IO, and Express.
 
 **Table of Contents**
+
 System Architecture
 
 Real-Time Communication
@@ -23,6 +24,7 @@ Contributing
 License
 
 **System Architecture**
+
 JM Clinics is split into two main services:
 
 **1. clinic-frontend**
@@ -60,6 +62,7 @@ Emits joinRoom with { patientId, doctorId }
 Listens for message events and renders messages live.
 
 Real-Time Communication
+
 Socket.IO powers live chat between doctors and patients:
 
 Client Side
