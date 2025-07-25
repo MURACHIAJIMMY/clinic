@@ -14,6 +14,7 @@ import {
   FaBars,
   FaTimes,
 } from 'react-icons/fa'
+import logo from '/vite.svg' // replace with your actual logo path
 
 export default function Landing() {
   const navigate = useNavigate()
@@ -31,8 +32,13 @@ export default function Landing() {
       {/* Navigation Bar */}
       <header className="bg-white fixed w-full z-20 shadow-md">
         <nav className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-blue-700">
-            JM Clinics
+          <Link to="/" className="flex items-center space-x-2">
+            <img
+              src={logo}
+              alt="JM Clinics Logo"
+              className="h-12 w-auto md:h-16"
+            />
+            <span className="text-2xl font-bold text-blue-700">JM Clinics</span>
           </Link>
 
           {/* Desktop Links */}
@@ -91,7 +97,7 @@ export default function Landing() {
       {/* Hero */}
       <section
         id="home"
-        className="relative h-screen bg-cover bg-center flex items-center justify-center pt-20"
+        className="relative h-screen bg-cover bg-center flex items-center justify-center pt-24"
         style={{ backgroundImage: "url('/hero-bg.jpg')" }}
       >
         <div className="absolute inset-0 bg-black opacity-50" />
