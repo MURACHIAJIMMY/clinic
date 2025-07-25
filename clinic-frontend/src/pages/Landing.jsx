@@ -1,5 +1,5 @@
 // src/pages/Landing.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   FaStethoscope,
@@ -11,17 +11,87 @@ import {
   FaEnvelope,
   FaLinkedin,
   FaFacebook,
+  FaBars,
+  FaTimes,
 } from 'react-icons/fa'
 
 export default function Landing() {
   const navigate = useNavigate()
   const cta = () => navigate('/login')
+  const [navOpen, setNavOpen] = useState(false)
+
+  const navLinks = [
+    { name: 'About', to: '#about' },
+    { name: 'Services', to: '#services' },
+    { name: 'Contact', to: '#contact' },
+  ]
 
   return (
     <div className="font-sans text-gray-800">
+      {/* Navigation Bar */}
+      <header className="bg-white fixed w-full z-20 shadow-md">
+        <nav className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/" className="text-2xl font-bold text-blue-700">
+            JM Clinics
+          </Link>
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center space-x-6">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.to}
+                className="text-gray-700 hover:text-blue-600 transition"
+              >
+                {link.name}
+              </a>
+            ))}
+            <button
+              onClick={cta}
+              className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition"
+            >
+              Book Now
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden text-2xl text-gray-700"
+            onClick={() => setNavOpen((o) => !o)}
+          >
+            {navOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </nav>
+
+        {/* Mobile Menu */}
+        {navOpen && (
+          <div className="md:hidden bg-white shadow-lg">
+            <div className="flex flex-col items-center space-y-4 py-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.to}
+                  onClick={() => setNavOpen(false)}
+                  className="text-gray-700 hover:text-blue-600 transition"
+                >
+                  {link.name}
+                </a>
+              ))}
+              <button
+                onClick={cta}
+                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded transition"
+              >
+                Book Now
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
       {/* Hero */}
       <section
-        className="relative h-screen bg-cover bg-center flex items-center justify-center"
+        id="home"
+        className="relative h-screen bg-cover bg-center flex items-center justify-center pt-20"
         style={{ backgroundImage: "url('/hero-bg.jpg')" }}
       >
         <div className="absolute inset-0 bg-black opacity-50" />
@@ -30,7 +100,8 @@ export default function Landing() {
             Welcome to JM Clinics
           </h1>
           <p className="text-lg text-gray-200 mb-6">
-            Your health is our mission ― expert care, modern facilities, and compassionate staff all under one roof.
+            Your health is our mission ― expert care, modern facilities, and compassionate
+            staff all under one roof.
           </p>
           <button
             onClick={cta}
@@ -41,8 +112,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-white">
+      {/* Features / Services */}
+      <section id="services" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-semibold mb-8">Why Choose JM Clinics?</h2>
           <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -72,40 +143,36 @@ export default function Landing() {
       </section>
 
       {/* About Us */}
-<section className="py-16 bg-gray-50">
-  <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
-
-    {/* Team Image */}
-    <img
-      src="/clinic-team.jpg"
-      alt="JM Clinics Team"
-      className="w-full md:w-1/2 rounded-lg shadow-lg object-cover h-96"
-    />
-
-    {/* Text Block */}
-    <div className="md:w-1/2 space-y-4">
-      <h2 className="text-3xl font-semibold mb-4">About JM Clinics</h2>
-      <p>
-        At JM Clinics, we blend state-of-the-art technology with personalized care. 
-        Our multidisciplinary team works together to bring you the highest standard 
-        of medical services in a warm, welcoming environment.
-      </p>
-      <p>
-        Whether you need a general check-up, specialized consultation, or emergency 
-        care, our doors are always open. Trust us with your health ― you’re in expert hands.
-      </p>
-      <button
-        onClick={cta}
-        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded shadow transition"
-      >
-        Get Started
-      </button>
-    </div>
-  </div>
-</section>
+      <section id="about" className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
+          <img
+            src="/clinic-team.jpg"
+            alt="JM Clinics Team"
+            className="w-full md:w-1/2 rounded-lg shadow-lg object-cover h-96"
+          />
+          <div className="md:w-1/2 space-y-4">
+            <h2 className="text-3xl font-semibold mb-4">About JM Clinics</h2>
+            <p>
+              At JM Clinics, we blend state-of-the-art technology with personalized care.
+              Our multidisciplinary team works together to bring you the highest standard
+              of medical services in a warm, welcoming environment.
+            </p>
+            <p>
+              Whether you need a general check-up, specialized consultation, or emergency
+              care, our doors are always open. Trust us with your health ― you’re in expert hands.
+            </p>
+            <button
+              onClick={cta}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded shadow transition"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Contact & Connect */}
-      <section className="py-16 bg-white">
+      <section id="contact" className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-semibold mb-8">Connect With Us</h2>
           <div className="flex flex-wrap justify-center gap-8">
@@ -118,7 +185,6 @@ export default function Landing() {
               <FaWhatsapp className="text-2xl" />
               <span>WhatsApp: +254 7967 19356</span>
             </a>
-
             <a
               href="tel:0748526233"
               className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
@@ -126,7 +192,6 @@ export default function Landing() {
               <FaPhoneAlt className="text-2xl" />
               <span>Call Us: 074 852 6233</span>
             </a>
-
             <a
               href="mailto:JMclinic@gmail.com"
               className="flex items-center space-x-2 text-red-600 hover:text-red-700"
@@ -134,7 +199,6 @@ export default function Landing() {
               <FaEnvelope className="text-2xl" />
               <span>Email: JMclinic@gmail.com</span>
             </a>
-
             <a
               href="https://www.linkedin.com/in/james-murachia-08b53233b"
               target="_blank"
@@ -144,7 +208,6 @@ export default function Landing() {
               <FaLinkedin className="text-2xl" />
               <span>LinkedIn</span>
             </a>
-
             <a
               href="https://www.facebook.com/JMClinics"
               target="_blank"
@@ -154,7 +217,6 @@ export default function Landing() {
               <FaFacebook className="text-2xl" />
               <span>Facebook</span>
             </a>
-
             <div className="flex items-center space-x-2 text-gray-600">
               <FaMapMarkerAlt className="text-2xl text-blue-500" />
               <span>123 Health St, Gilgil, Nakuru, Kenya</span>
