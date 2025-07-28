@@ -12,7 +12,7 @@
 
 const express = require('express')
 const router  = express.Router()
-const auth    = require('../middleware/auth')          // your JWT/session guard
+const auth    = require('../middleware/authMiddleware')          // your JWT/session guard
 const {
   saveMessage,      // for Socket integration
   getRoomMessages,  // our updated handler
