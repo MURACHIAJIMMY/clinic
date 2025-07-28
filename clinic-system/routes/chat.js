@@ -12,16 +12,22 @@
 
 const express = require('express')
 const router  = express.Router()
-const auth    = require('../middleware/authMiddleware')          // your JWT/session guard
+
+// Grab the function directly
+const { protect } = require('../middleware/authMiddleware')
+
 const {
-  saveMessage,      // for Socket integration
-  getRoomMessages,  // our updated handler
+  saveMessage,
+  getRoomMessages,
 } = require('../controllers/chatController')
 
-// Only authenticated users can fetch room messages
+// Sanity check
+console.log('🚦 protect is a', typeof protect) // should log "function"
+console.log('🚦 getRoomMessages is a', typeof getRoomMessages) // should log "function"
+
 router.get(
   '/rooms/:roomId/messages',
-  auth,
+  protect,
   getRoomMessages
 )
 
