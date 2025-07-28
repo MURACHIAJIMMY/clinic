@@ -57,24 +57,30 @@
 
 /* eslint-env node */
 
-import path          from "path"
+import path              from "path"
 import { fileURLToPath } from "url"
-import { defineConfig }   from "vite"
-import react         from "@vitejs/plugin-react"
-import tailwindcss   from "@tailwindcss/vite"
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import { defineConfig, loadEnv } from "vite"
+import react             from "@vitejs/plugin-react"
+import tailwindcss       from "@tailwindcss/vite"
 
 export default defineConfig(({ mode }) => {
+  // 1) __dirname shim for ESM
+  const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+  // 2) Load all env vars from .env, .env.[mode], and process.env
+  //    Prefix filter '' so we pick up VITE_API_URL, VITE_CLIENT_URL, etc.
+  const env = loadEnv(mode, __dirname, "")
+
+  // 3) Pull values out (guaranteed to be strings if set in environment)
   const isDev     = mode === "development"
-  const apiUrl    = import.meta.env.VITE_API_URL    || "http://localhost:5000"
-  const clientUrl = import.meta.env.VITE_CLIENT_URL || "http://localhost:3000"
+  const apiUrl    = env.VITE_API_URL    || "http://localhost:5000"
+  const clientUrl = env.VITE_CLIENT_URL || "http://localhost:3000"
 
   return {
     base: "/",
     plugins: [
-      react(),
-      tailwindcss(),
+      react(),       // JSX + Fast Refresh
+      tailwindcss(), // Tailwind integration
     ],
     resolve: {
       alias: {
@@ -82,7 +88,7 @@ export default defineConfig(({ mode }) => {
       },
     },
 
-    // only for `npm run dev`
+    // 4) Dev‐server only
     server: isDev
       ? {
           port: 3000,
@@ -103,16 +109,21 @@ export default defineConfig(({ mode }) => {
             },
             "/socket.io": {
               target:       apiUrl,
-              ws:           true,
               changeOrigin: true,
+              ws:           true,
               secure:       false,
             },
           },
         }
       : undefined,
 
-    // no need for a `define` section — `import.meta.env` is baked in
+    // 5) Expose these values inside your client code as import.meta.env.VITE_*
+    define: {
+      "import.meta.env.VITE_API_URL":    JSON.stringify(apiUrl),
+      "import.meta.env.VITE_CLIENT_URL": JSON.stringify(clientUrl),
+    },
 
+    // 6) Production build
     build: {
       outDir:    "dist",
       sourcemap: false,
