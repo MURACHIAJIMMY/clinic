@@ -1,25 +1,192 @@
 
 
+// // server.js
+// require('dotenv').config();
+// const http    = require('http');
+// const express = require('express');
+// const cors    = require('cors');
+// const path    = require('path');
+// const jwt     = require('jsonwebtoken');
+// const { Server } = require('socket.io');
+
+// const connectDB          = require('./config/db');
+// const User               = require('./Models/userModel');
+// const Appointment        = require('./Models/appointmentModel');
+// const ChatMessage        = require('./Models/chatModel');    // your message schema
+
+// const authRoutes         = require('./routes/authRoutes');
+// const doctorRoutes       = require('./routes/doctorRoutes');
+// const appointmentRoutes  = require('./routes/appointmentRoutes');
+// const patientRoutes      = require('./routes/patientRoutes');
+// const chatRoutes         = require('./routes/chat');
+// const userRoutes         = require('./routes/userRoutes');
+
+// const startServer = async () => {
+//   // 1) Connect to MongoDB
+//   await connectDB(process.env.MONGODB_URI);
+//   console.log('🔌 MongoDB connected');
+
+//   // 2) Create Express app
+//   const app = express();
+//   app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+//   app.use(express.json());
+//   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+//   app.get('/', (_req, res) =>
+//     res.send('Clinic System API + Socket.IO is running…')
+//   );
+
+//   // 3) Mount REST API routers
+//   app.use('/api/auth',        authRoutes);
+//   app.use('/api/doctors',     doctorRoutes);
+//   app.use('/api/appointments', appointmentRoutes);
+//   app.use('/api/patients',    patientRoutes);
+//   app.use('/api/chat',        chatRoutes);
+//   app.use('/api/users',       userRoutes);
+
+//   // 4) Create HTTP server & attach Socket.IO
+//   const server = http.createServer(app);
+//   const io = new Server(server, {
+//     cors: {
+//       origin:     process.env.CLIENT_URL,
+//       credentials: true,
+//     },
+//   });
+
+//   // 5) Socket-level JWT authentication
+//   io.use(async (socket, next) => {
+//     try {
+//       const token = socket.handshake.auth?.token;
+//       if (!token) throw new Error('NO_TOKEN');
+
+//       const { id: userId } = jwt.verify(token, process.env.JWT_SECRET);
+//       const user = await User.findById(userId).select('-password');
+//       if (!user) throw new Error('USER_NOT_FOUND');
+
+//       socket.user = user;
+//       return next();
+//     } catch (err) {
+//       console.error('🔒 Socket auth failed:', err.message);
+//       return next(new Error('Unauthorized'));
+//     }
+//   });
+
+//   // 6) Handle socket events
+//   io.on('connection', (socket) => {
+//     console.log('🔌 Socket connected:', socket.id, socket.user._id);
+
+//     // Join a chat room (appointmentId as roomId)
+//     socket.on('joinRoom', async ({ roomId }) => {
+//       try {
+//         // Verify appointment exists
+//         const appt = await Appointment.findById(roomId);
+//         if (!appt) throw new Error('APPOINTMENT_NOT_FOUND');
+
+//         // Only doctor or patient may join
+//         const userId = socket.user._id.toString();
+//         if (
+//           userId !== appt.doctor.toString() &&
+//           userId !== appt.patient.toString()
+//         ) {
+//           throw new Error('ACCESS_DENIED');
+//         }
+
+//         socket.join(roomId);
+//         socket.emit('joinedRoom', { roomId });
+//         console.log(`➡️ ${userId} joined room ${roomId}`);
+//       } catch (err) {
+//         console.warn('❌ joinRoom error:', err.message);
+//         socket.emit('error', { message: err.message });
+//       }
+//     });
+
+//     // Send & broadcast a chat message
+//     socket.on('sendMessage', async ({ roomId, text }) => {
+//       try {
+//         const appt = await Appointment.findById(roomId);
+//         if (!appt) throw new Error('APPOINTMENT_NOT_FOUND');
+
+//         const userId = socket.user._id.toString();
+//         if (
+//           userId !== appt.doctor.toString() &&
+//           userId !== appt.patient.toString()
+//         ) {
+//           throw new Error('ACCESS_DENIED');
+//         }
+
+//         // Persist message
+//         const msg = await ChatMessage.create({
+//           roomId,
+//           sender: userId,
+//           message: text,
+//           timestamp: new Date(),
+//           status: 'sent',
+//         });
+
+//         // Broadcast to room
+//         io.to(roomId).emit('receiveMessage', {
+//           _id:       msg._id,
+//           roomId:    msg.roomId,
+//           senderId:  msg.sender.toString(),
+//           text:      msg.message,
+//           createdAt: msg.timestamp.toISOString(),
+//         });
+//       } catch (err) {
+//         console.error('❌ sendMessage error:', err.message);
+//         socket.emit('error', { message: err.message });
+//       }
+//     });
+
+//     // Typing indicator
+//     socket.on('typing', ({ roomId }) => {
+//       if (socket.rooms.has(roomId)) {
+//         socket.to(roomId).emit('typing', { userId: socket.user._id });
+//       }
+//     });
+
+//     socket.on('stopTyping', ({ roomId }) => {
+//       if (socket.rooms.has(roomId)) {
+//         socket.to(roomId).emit('stopTyping', { userId: socket.user._id });
+//       }
+//     });
+
+//     socket.on('disconnect', () =>
+//       console.log('❌ Socket disconnected:', socket.id)
+//     );
+//   });
+
+//   // 7) Start listening
+//   const PORT = process.env.PORT || 5000;
+//   server.listen(PORT, () =>
+//     console.log(`✅ Server + Socket.IO listening on port ${PORT}`)
+//   );
+// };
+
+// startServer().catch(err => {
+//   console.error('❌ Server failed to start:', err);
+//   process.exit(1);
+// });
+
 // server.js
 require('dotenv').config();
-const http    = require('http');
-const express = require('express');
-const cors    = require('cors');
-const path    = require('path');
-const jwt     = require('jsonwebtoken');
-const { Server } = require('socket.io');
+const http        = require('http');
+const express     = require('express');
+const cors        = require('cors');
+const path        = require('path');
+const jwt         = require('jsonwebtoken');
+const { Server }  = require('socket.io');
 
-const connectDB          = require('./config/db');
-const User               = require('./Models/userModel');
-const Appointment        = require('./Models/appointmentModel');
-const ChatMessage        = require('./Models/chatModel');    // your message schema
+const connectDB         = require('./config/db');
+const User              = require('./Models/userModel');
+const Appointment       = require('./Models/appointmentModel');
+const ChatMessage       = require('./Models/chatModel');
 
-const authRoutes         = require('./routes/authRoutes');
-const doctorRoutes       = require('./routes/doctorRoutes');
-const appointmentRoutes  = require('./routes/appointmentRoutes');
-const patientRoutes      = require('./routes/patientRoutes');
-const chatRoutes         = require('./routes/chat');
-const userRoutes         = require('./routes/userRoutes');
+const authRoutes        = require('./routes/authRoutes');
+const doctorRoutes      = require('./routes/doctorRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const patientRoutes     = require('./routes/patientRoutes');
+const chatRoutes        = require('./routes/chat');
+const userRoutes        = require('./routes/userRoutes');
 
 const startServer = async () => {
   // 1) Connect to MongoDB
@@ -53,8 +220,15 @@ const startServer = async () => {
     },
   });
 
+  // DEBUG: catch any global connection errors
+  io.on('connection_error', (err) =>
+    console.error('❌ Global socket connection_error:', err.message)
+  );
+
   // 5) Socket-level JWT authentication
   io.use(async (socket, next) => {
+    console.log('🔎 handshake.auth →', socket.handshake.auth);
+
     try {
       const token = socket.handshake.auth?.token;
       if (!token) throw new Error('NO_TOKEN');
@@ -64,10 +238,10 @@ const startServer = async () => {
       if (!user) throw new Error('USER_NOT_FOUND');
 
       socket.user = user;
-      return next();
+      next();
     } catch (err) {
       console.error('🔒 Socket auth failed:', err.message);
-      return next(new Error('Unauthorized'));
+      next(new Error('Unauthorized'));
     }
   });
 
@@ -75,14 +249,11 @@ const startServer = async () => {
   io.on('connection', (socket) => {
     console.log('🔌 Socket connected:', socket.id, socket.user._id);
 
-    // Join a chat room (appointmentId as roomId)
     socket.on('joinRoom', async ({ roomId }) => {
       try {
-        // Verify appointment exists
         const appt = await Appointment.findById(roomId);
         if (!appt) throw new Error('APPOINTMENT_NOT_FOUND');
 
-        // Only doctor or patient may join
         const userId = socket.user._id.toString();
         if (
           userId !== appt.doctor.toString() &&
@@ -100,7 +271,6 @@ const startServer = async () => {
       }
     });
 
-    // Send & broadcast a chat message
     socket.on('sendMessage', async ({ roomId, text }) => {
       try {
         const appt = await Appointment.findById(roomId);
@@ -114,16 +284,14 @@ const startServer = async () => {
           throw new Error('ACCESS_DENIED');
         }
 
-        // Persist message
         const msg = await ChatMessage.create({
           roomId,
-          sender: userId,
-          message: text,
+          sender:    userId,
+          message:   text,
           timestamp: new Date(),
-          status: 'sent',
+          status:    'sent',
         });
 
-        // Broadcast to room
         io.to(roomId).emit('receiveMessage', {
           _id:       msg._id,
           roomId:    msg.roomId,
@@ -137,7 +305,6 @@ const startServer = async () => {
       }
     });
 
-    // Typing indicator
     socket.on('typing', ({ roomId }) => {
       if (socket.rooms.has(roomId)) {
         socket.to(roomId).emit('typing', { userId: socket.user._id });
