@@ -23,44 +23,29 @@
 
 // module.exports = router
 
-// src/lib/axios.js
-import axios from 'axios'
+// routes/chat.js
+const express = require('express')
+const router  = express.Router()
+const { protect } = require('../middleware/authMiddleware')
+const {
+  saveMessage,
+  getRoomMessages,
+} = require('../controllers/chatController')
 
-// Read your VITE_API_URL and detect dev vs. prod
-const API_URL = import.meta.env.VITE_API_URL || ''
-const isDev   = import.meta.env.DEV
+// Sanity check
+console.log('🚦 protect is a', typeof protect)
+console.log('🚦 getRoomMessages is a', typeof getRoomMessages)
 
-// Compute baseURL:
-//  - in dev → use Vite’s proxy at "/api"
-//  - in prod → point at your Render-hosted backend + "/api"
-const baseURL = isDev
-  ? '/api'
-  : `${API_URL.replace(/\/$/, '')}/api`
+router.get(
+  '/rooms/:roomId/messages',
+  protect,
+  getRoomMessages
+)
 
-// Debug logs to confirm what you’ll actually hit
-console.log('📡 VITE_API_URL →', API_URL)
-console.log('🔗 axios baseURL →', baseURL)
+router.post(
+  '/rooms/:roomId/messages',
+  protect,
+  saveMessage
+)
 
-// Create the axios instance
-const api = axios.create({
-  baseURL,
-  withCredentials: true,       // send cookies if you’re using sessions
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-// Attach token to every request and log it
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  console.log('🔑 token:', token)
-
-  config.headers = config.headers || {}
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-    console.log('🛡️ auth header set to:', config.headers.Authorization)
-  }
-  return config
-})
-
-export default api
+module.exports = router
