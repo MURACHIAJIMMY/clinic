@@ -161,29 +161,22 @@ const chatRoutes        = require('./routes/chat');
 const userRoutes        = require('./routes/userRoutes');
 
 async function startServer() {
-  // 1) Connect to MongoDB
+  // 1) MongoDB
   await connectDB(process.env.MONGODB_URI);
   console.log('🔌 MongoDB connected');
 
-  // 2) Create Express app & middleware
+  // 2) Express & Middleware
   const app = express();
   const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
-  app.use(
-    cors({
-      origin:      CLIENT_URL,
-      credentials: true,
-    })
-  );
+  app.use(cors({ origin: CLIENT_URL, credentials: true }));
   app.use(express.json());
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // 3) Health check (under /api to avoid clashing with SPA)
-  app.get('/api/health', (_req, res) => {
-    res.send('OK');
-  });
+  // 3) Health-check
+  app.get('/api/health', (_req, res) => res.send('OK'));
 
-  // 4) Mount API routers
+  // 4) API Routers (all relative paths)
   app.use('/api/auth',        authRoutes);
   app.use('/api/doctors',     doctorRoutes);
   app.use('/api/appointments', appointmentRoutes);
@@ -191,33 +184,26 @@ async function startServer() {
   app.use('/api/chat',        chatRoutes);
   app.use('/api/users',       userRoutes);
 
-  // ─── 5) Socket.IO Setup ───────────────────────────────────────
-  // Create HTTP server before mounting Socket.IO
+  // 5) HTTP + Socket.IO
   const server = http.createServer(app);
   const io = new Server(server, {
     path: '/socket.io',
-    cors: {
-      origin:      CLIENT_URL,
-      methods:     ['GET', 'POST'],
-      credentials: true,
-    },
+    cors: { origin: CLIENT_URL, methods: ['GET','POST'], credentials: true }
   });
 
-  // 5a) Engine & connection error logging
+  // 5a) Engine errors
   io.engine.on('connection_error', (err) =>
-    console.error('❌ Socket engine connection_error:', err)
+    console.error('❌ Socket engine error:', err)
   );
 
-  // 5b) Socket-level JWT authentication
+  // 5b) JWT auth on socket
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth?.token;
       if (!token) throw new Error('NO_TOKEN');
-
       const payload = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(payload.id).select('-password');
       if (!user) throw new Error('USER_NOT_FOUND');
-
       socket.user = user;
       next();
     } catch (err) {
@@ -226,41 +212,32 @@ async function startServer() {
     }
   });
 
-  // 5c) Socket event handlers
+  // 5c) Real-time events
   io.on('connection', (socket) => {
     console.log('✅ Socket connected:', socket.id);
 
-    socket.on('joinRoom', async ({ roomId }) => {
-      // … join logic …
-    });
+    socket.on('joinRoom',   ({ roomId }) => socket.join(roomId));
+    socket.on('sendMessage',({ roomId, text }) =>
+      socket.to(roomId).emit('message', { user: socket.user, text })
+    );
+    socket.on('typing',     ({ roomId }) =>
+      socket.to(roomId).emit('typing', { userId: socket.user._id })
+    );
+    socket.on('stopTyping', ({ roomId }) =>
+      socket.to(roomId).emit('stopTyping', { userId: socket.user._id })
+    );
 
-    socket.on('sendMessage', async ({ roomId, text }) => {
-      // … send logic …
-    });
-
-    socket.on('typing', ({ roomId }) => {
-      if (socket.rooms.has(roomId)) {
-        socket.to(roomId).emit('typing', { userId: socket.user._id });
-      }
-    });
-
-    socket.on('stopTyping', ({ roomId }) => {
-      if (socket.rooms.has(roomId)) {
-        socket.to(roomId).emit('stopTyping', { userId: socket.user._id });
-      }
-    });
-
-    socket.on('disconnect', () => {
-      console.log('❌ Socket disconnected:', socket.id);
-    });
+    socket.on('disconnect', () =>
+      console.log('❌ Socket disconnected:', socket.id)
+    );
   });
 
-  // ─── 6) Serve Frontend & SPA Fallback ─────────────────────────
+  // 6) Serve Frontend + SPA Fallback
   const clientDist = path.join(__dirname, 'clinic-frontend', 'dist');
   app.use(express.static(clientDist));
 
-  // Exclude API, socket.io, and asset requests from falling back
-  app.get('*', (req, res, next) => {
+  // Only handle non-API, non-socket, non-asset GETs here
+  app.get('/*', (req, res, next) => {
     const isApi    = req.path.startsWith('/api');
     const isSocket = req.path.startsWith('/socket.io');
     const isAsset  = path.extname(req.path).length > 0;
@@ -271,14 +248,14 @@ async function startServer() {
     next();
   });
 
-  // 7) Start listening
+  // 7) Start Server
   const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => {
-    console.log('🚀 Server + Socket.IO listening on port', PORT);
-  });
+  server.listen(PORT, () =>
+    console.log('🚀 Server + Socket.IO on port', PORT)
+  );
 }
 
 startServer().catch((err) => {
-  console.error('❌ Server failed to start:', err);
+  console.error('❌ Failed to start server:', err);
   process.exit(1);
 });
