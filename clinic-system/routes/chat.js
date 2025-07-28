@@ -23,17 +23,13 @@
 
 // module.exports = router
 
-// routes/chat.js
 const express = require('express')
 const router  = express.Router()
 const { protect } = require('../middleware/authMiddleware')
-const {
-  saveMessage,
-  getRoomMessages,
-} = require('../controllers/chatController')
+const { saveMessage, getRoomMessages } = require('../controllers/chatController')
 
-// Sanity check
 console.log('🚦 protect is a', typeof protect)
+console.log('🚦 saveMessage is a', typeof saveMessage)
 console.log('🚦 getRoomMessages is a', typeof getRoomMessages)
 
 router.get(
