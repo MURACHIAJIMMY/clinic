@@ -184,8 +184,6 @@ const { Server } = require('socket.io');
 
 const connectDB         = require('./config/db');
 const User              = require('./Models/userModel');
-const Appointment       = require('./Models/appointmentModel');
-const ChatMessage       = require('./Models/chatModel');
 
 const authRoutes        = require('./routes/authRoutes');
 const doctorRoutes      = require('./routes/doctorRoutes');
@@ -199,28 +197,25 @@ const startServer = async () => {
   await connectDB(process.env.MONGODB_URI);
   console.log('🔌 MongoDB connected');
 
-  // 2) Create Express app
+  // 2) Initialize Express and Middleware
   const app = express();
-
-  // 2a) CORS configuration
   const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+
   app.use(
     cors({
       origin:      CLIENT_URL,
       credentials: true
     })
   );
-
-  // 2b) JSON parser & uploads
   app.use(express.json());
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // 2c) Health check endpoint
+  // 3) Health Check
   app.get('/', (_req, res) => {
     res.send('Clinic System API + Socket.IO is running…');
   });
 
-  // 3) Mount API routers
+  // 4) API Routes (all under /api)
   app.use('/api/auth',        authRoutes);
   app.use('/api/doctors',     doctorRoutes);
   app.use('/api/appointments', appointmentRoutes);
@@ -228,18 +223,23 @@ const startServer = async () => {
   app.use('/api/chat',        chatRoutes);
   app.use('/api/users',       userRoutes);
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 4) Serve front-end build & SPA fallback
-  const clientDistPath = path.join(__dirname, 'dist');
-  app.use(express.static(clientDistPath));
+  // 5) Serve Frontend and SPA Fallback
+  const clientDist = path.join(__dirname, 'dist');
+  app.use(express.static(clientDist));
 
-  // Use a named wildcard with the '*' modifier (no parentheses)
-  app.get('/:splat*', (req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+  // Fallback: serve index.html for any non-API GET request
+  app.use((req, res, next) => {
+    if (
+      req.method === 'GET' &&
+      !req.path.startsWith('/api') &&
+      !req.path.includes('.')    // skip requests for static assets
+    ) {
+      return res.sendFile(path.join(clientDist, 'index.html'));
+    }
+    next();
   });
-  // ─────────────────────────────────────────────────────────────────────────────
 
-  // 5) Create HTTP server & attach Socket.IO
+  // 6) HTTP Server + Socket.IO Setup
   const server = http.createServer(app);
   const io = new Server(server, {
     cors: {
@@ -250,15 +250,15 @@ const startServer = async () => {
     path: '/socket.io'
   });
 
-  // 5a) Global socket errors
-  io.on('connection_error', (err) => {
-    console.error('❌ Global socket connection_error:', err.message);
+  // 6a) Global Socket Error Handling
+  io.on('connection_error', err => {
+    console.error('❌ Socket connection_error:', err.message);
   });
 
-  // 6) Socket-level JWT authentication
+  // 6b) Socket-Level JWT Auth
   io.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth && socket.handshake.auth.token;
+      const token = socket.handshake.auth?.token;
       if (!token) throw new Error('NO_TOKEN');
 
       const payload = jwt.verify(token, process.env.JWT_SECRET);
@@ -273,8 +273,8 @@ const startServer = async () => {
     }
   });
 
-  // 7) Handle socket events
-  io.on('connection', (socket) => {
+  // 6c) Socket Event Handlers
+  io.on('connection', socket => {
     console.log('🔌 Socket connected:', socket.id, socket.user._id);
 
     socket.on('joinRoom', async ({ roomId }) => {
@@ -302,14 +302,14 @@ const startServer = async () => {
     });
   });
 
-  // 8) Start the server
+  // 7) Start Listening
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
-    console.log('✅ Server + Socket.IO listening on port ' + PORT);
+    console.log('✅ Server + Socket.IO listening on port', PORT);
   });
 };
 
-startServer().catch((err) => {
+startServer().catch(err => {
   console.error('❌ Server failed to start:', err);
   process.exit(1);
 });
