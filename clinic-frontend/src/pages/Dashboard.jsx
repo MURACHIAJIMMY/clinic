@@ -63,13 +63,16 @@ export default function Dashboard() {
             </p>
 
             {targetUserId ? (
-              // <Link to={`/chat/${user._id}/${targetUserId}`}>
-              //   <Button className="mt-4 bg-blue-600 text-white hover:bg-blue-700">
-              //     💬 Chat with Patient
-              //   </Button>
-              // </Link>
-              <Link to={`/chat/doctor_${user._id}_patient_${targetUserId}`}>
-  <Button className="mt-4 bg-blue-600 text-white hover:bg-blue-700">💬 Chat with Patient</Button>
+             <Link
+  to={`/chat/doctor_${user._id}_patient_${targetUserId}`}
+  state={{
+    patientId: targetUserId,
+    appointmentId: null, // Or pass one if available
+  }}
+>
+  <Button className="mt-4 bg-blue-600 text-white hover:bg-blue-700">
+    💬 Chat with Patient
+  </Button>
 </Link>
 
             ) : (
@@ -106,13 +109,16 @@ export default function Dashboard() {
             </Link>
 
             {targetUserId ? (
-              // <Link to={`/chat/${targetUserId}/${user._id}`}>
-              //   <Button className="mt-4 bg-green-600 text-white hover:bg-green-700">
-              //     💬 Message Your Doctor
-              //   </Button>
-              // </Link>
-              <Link to={`/chat/doctor_${targetUserId}_patient_${user._id}`}>
-  <Button className="mt-4 bg-green-600 text-white hover:bg-green-700">💬 Message Your Doctor</Button>
+      <Link
+  to={`/chat/doctor_${targetUserId}_patient_${user._id}`}
+  state={{
+    patientId: user._id,
+    appointmentId: null,
+  }}
+>
+  <Button className="mt-4 bg-green-600 text-white hover:bg-green-700">
+    💬 Message Your Doctor
+  </Button>
 </Link>
 
             ) : (
