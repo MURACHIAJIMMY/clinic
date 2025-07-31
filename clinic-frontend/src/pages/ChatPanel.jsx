@@ -157,7 +157,7 @@ useEffect(() => {
       </h2>
 
       <div className="messages h-64 bg-yellow-100 overflow-auto border p-2 mb-2">
-        {messages.map((m, i) => (
+        {/* {messages.map((m, i) => (
           <div
             key={i}
             className={`msg ${m.sender._id === userId ? 'mine' : 'theirs'}`}
@@ -165,7 +165,19 @@ useEffect(() => {
             <p>{m.text || m.message}</p>
             <small>{new Date(m.createdAt).toLocaleTimeString()}</small>
           </div>
-        ))}
+        ))} */}
+        {messages.map((m, i) => {
+  const senderId = m?.sender?._id || m?.senderId || m?.user;
+  const mine     = senderId === userId;
+
+  return (
+    <div key={i} className={`msg ${mine ? 'mine' : 'theirs'}`}>
+      <p>{m.text || m.message}</p>
+      <small>{new Date(m.createdAt || m.timestamp).toLocaleTimeString()}</small>
+    </div>
+  );
+})}
+
         {isTyping && <p className="italic">Typing…</p>}
         <div ref={scrollRef} />
       </div>

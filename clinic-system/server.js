@@ -12,6 +12,7 @@
 
 // const connectDB           = require('./config/db');
 // const User                = require('./Models/userModel');
+// const ChatMessage         = require('./Models/chatModel'); // 👈 NEW import
 // const authRoutes          = require('./routes/authRoutes');
 // const doctorRoutes        = require('./routes/doctorRoutes');
 // const appointmentRoutes   = require('./routes/appointmentRoutes');
@@ -20,29 +21,20 @@
 // const userRoutes          = require('./routes/userRoutes');
 
 // async function startServer() {
-//   // 1) Connect to MongoDB
 //   await connectDB(process.env.MONGODB_URI);
 //   console.log('🔌 MongoDB connected');
 
-//   // 2) Initialize Express & middleware
 //   const app = express();
 //   const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
-//   app.use(
-//     cors({
-//       origin:      CLIENT_URL,
-//       credentials: true
-//     })
-//   );
+//   app.use(cors({ origin: CLIENT_URL, credentials: true }));
 //   app.use(express.json());
 //   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-//   // 3) Health check
 //   app.get('/', (_req, res) => {
 //     res.send('Clinic System API + Socket.IO is running…');
 //   });
 
-//   // 4) API routes (all under /api)
 //   app.use('/api/auth',        authRoutes);
 //   app.use('/api/doctors',     doctorRoutes);
 //   app.use('/api/appointments', appointmentRoutes);
@@ -50,11 +42,9 @@
 //   app.use('/api/chat',        chatRoutes);
 //   app.use('/api/users',       userRoutes);
 
-//   // 5) Serve frontend static assets
 //   const clientDist = path.join(__dirname, 'clinic-frontend', 'dist');
 //   app.use(express.static(clientDist));
 
-//   // 6) SPA fallback: serve index.html for non-API GETs without file extension
 //   app.use((req, res, next) => {
 //     if (
 //       req.method === 'GET' &&
@@ -66,7 +56,6 @@
 //     next();
 //   });
 
-//   // 7) Create HTTP server & attach Socket.IO
 //   const server = http.createServer(app);
 //   const io = new Server(server, {
 //     path: '/socket.io',
@@ -77,12 +66,10 @@
 //     }
 //   });
 
-//   // 7a) Socket engine errors
 //   io.engine.on('connection_error', err => {
 //     console.error('❌ Socket connection_error:', err.message);
 //   });
 
-//   // 7b) JWT authentication for sockets
 //   io.use(async (socket, next) => {
 //     try {
 //       const token = socket.handshake.auth?.token;
@@ -100,20 +87,31 @@
 //     }
 //   });
 
-//   // 7c) Socket event handlers
 //   io.on('connection', socket => {
 //     console.log('🔌 Socket connected:', socket.id, socket.user._id);
 
-//     socket.on('joinRoom', async ({ roomId }) => {
+//     socket.on('joinRoom', ({ roomId }) => {
+//       console.log(`🚪 ${socket.user.name} joined room ${roomId}`);
 //       socket.join(roomId);
 //     });
 
 //     socket.on('sendMessage', async ({ roomId, text }) => {
-//       io.to(roomId).emit('receiveMessage', {
-//         user: socket.user._id,
-//         text,
-//         timestamp: Date.now()
-//       });
+//       try {
+//         const saved = await ChatMessage.create({
+//           roomId,
+//           sender: socket.user._id,
+//           message: text,
+//           timestamp: new Date()
+//         });
+
+//         io.to(roomId).emit('receiveMessage', {
+//           sender: { _id: saved.sender },
+//           message: saved.message,
+//           createdAt: saved.timestamp.toISOString()
+//         });
+//       } catch (err) {
+//         console.error('💾 Failed to save message:', err.message);
+//       }
 //     });
 
 //     socket.on('typing', ({ roomId }) => {
@@ -133,7 +131,6 @@
 //     });
 //   });
 
-//   // 8) Start the server
 //   const PORT = process.env.PORT || 5000;
 //   server.listen(PORT, () => {
 //     console.log('✅ Server + Socket.IO listening on port', PORT);
@@ -145,7 +142,6 @@
 //   process.exit(1);
 // });
 
-// server.js
 require('dotenv').config();
 
 const http        = require('http');
@@ -157,7 +153,7 @@ const { Server }  = require('socket.io');
 
 const connectDB           = require('./config/db');
 const User                = require('./Models/userModel');
-const ChatMessage         = require('./Models/chatModel'); // 👈 NEW import
+const ChatMessage         = require('./Models/chatModel');
 const authRoutes          = require('./routes/authRoutes');
 const doctorRoutes        = require('./routes/doctorRoutes');
 const appointmentRoutes   = require('./routes/appointmentRoutes');
@@ -249,8 +245,19 @@ async function startServer() {
           timestamp: new Date()
         });
 
+        const senderData = {
+          _id: socket.user._id,
+          name: socket.user.name,
+          role: socket.user.role
+        };
+
+        console.log('✅ Emitting message:', {
+          sender: senderData,
+          message: saved.message
+        });
+
         io.to(roomId).emit('receiveMessage', {
-          sender: { _id: saved.sender },
+          sender: senderData,
           message: saved.message,
           createdAt: saved.timestamp.toISOString()
         });
