@@ -67,12 +67,18 @@ export default function Appointments() {
   };
 
   // New: Navigate to chat room
-  const startChat = (patientId, appointmentId) => {
-    const roomId = appointmentId; 
-    navigate(`/chat/${roomId}`, {
-      state: { patientId, appointmentId },
-    });
-  };
+  // const startChat = (patientId, appointmentId) => {
+  //   const roomId = appointmentId; 
+  //   navigate(`/chat/${roomId}`, {
+  //     state: { patientId, appointmentId },
+  //   });
+  // };
+const startChat = (patientId, appointmentId) => {
+  const roomId = `doctor_${user._id}_patient_${patientId}`;
+  navigate(`/chat/${roomId}`, {
+    state: { patientId, appointmentId },
+  });
+};
 
   useEffect(() => {
     fetchAppointments();
