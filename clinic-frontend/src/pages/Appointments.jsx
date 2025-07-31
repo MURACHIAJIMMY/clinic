@@ -208,8 +208,8 @@ export default function Appointments() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAppointments(res.data);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch appointments');
+    } catch {
+      toast.error('Failed to fetch appointments');
     }
   };
 
@@ -225,8 +225,8 @@ export default function Appointments() {
       );
       toast.success(`Appointment ${status}`);
       fetchAppointments();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update appointment');
+    } catch {
+      toast.error('Failed to update appointment');
     }
   };
 
@@ -238,8 +238,8 @@ export default function Appointments() {
       });
       toast.success('Appointment deleted');
       fetchAppointments();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete appointment');
+    } catch {
+      toast.error('Failed to delete appointment');
     }
   };
 
@@ -247,10 +247,29 @@ export default function Appointments() {
     toast.info(`Open modal or redirect to edit appointment with ID: ${appt._id}`);
   };
 
-  const startChat = (patientId, appointmentId) => {
-    const roomId = `doctor_${user._id}_patient_${patientId}`;
+  const fetchPatientInfo = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await api.get(`/api/user/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch {
+      toast.error('Patient fetch failed');
+      return null;
+    }
+  };
+
+  const startChat = async (patientId, appointmentId) => {
+    const patient = await fetchPatientInfo(patientId);
+    if (!patient?._id) {
+      toast.error('Unable to start chat — patient info not found');
+      return;
+    }
+
+    const roomId = `doctor_${user._id}_patient_${patient._id}`;
     navigate(`/chat/${roomId}`, {
-      state: { patientId, appointmentId },
+      state: { patientId: patient._id, appointmentId },
     });
   };
 
@@ -328,7 +347,6 @@ export default function Appointments() {
                             Delete
                           </button>
 
-                          {/* ✅ Message button now supports both populated and raw ID formats */}
                           {createdById && (
                             <button
                               onClick={() => startChat(createdById, appt._id)}
