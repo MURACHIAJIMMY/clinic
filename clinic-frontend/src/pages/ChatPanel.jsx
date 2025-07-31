@@ -1,5 +1,4 @@
 
-
 // src/pages/ChatPanel.jsx
 import { useContext, useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
@@ -30,11 +29,13 @@ export default function ChatPanel() {
   const socket = useContext(SocketContext)
   const ready  = Boolean(socket) && Boolean(userId)
 
-  const [messages, setMessages] = useState([])
-  const [input, setInput]       = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const scrollRef               = useRef(null)
-  const typingTimeoutRef        = useRef(null)
+  const [messages, setMessages]   = useState([])
+  const [input, setInput]         = useState('')
+  const [isTyping, setIsTyping]   = useState(false)
+  const [patientInfo, setPatientInfo] = useState(null)
+
+  const scrollRef         = useRef(null)
+  const typingTimeoutRef  = useRef(null)
 
   useEffect(() => {
     api.get(`/chat/rooms/${roomId}/messages`)
@@ -106,6 +107,19 @@ export default function ChatPanel() {
     }
   }, [socket, userId, roomId, ready, doctorId, patientId, appointmentId])
 
+  // 🧠 Fetch Patient Info
+  useEffect(() => {
+    if (!patientId || user?.role !== 'doctor') return;
+
+    api.get(`/users/${patientId}`)
+      .then(res => {
+        setPatientInfo(res.data)
+      })
+      .catch(err => {
+        console.error('❌ Failed to fetch patient info:', err)
+      })
+  }, [patientId, user?.role])
+
   const sendMessage = () => {
     if (!input.trim()) return
 
@@ -139,6 +153,12 @@ export default function ChatPanel() {
       >
         ↩️ Back to Dashboard
       </button>
+
+      {patientInfo?.name && (
+        <div className="text-center text-gray-700 text-sm mb-2">
+          Chatting with: <strong>{patientInfo.name}</strong>
+        </div>
+      )}
 
       <h2 className="text-center mb-4">
         Chat (Appointment: {appointmentId})

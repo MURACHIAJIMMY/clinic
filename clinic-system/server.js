@@ -89,10 +89,19 @@ async function startServer() {
   io.on('connection', socket => {
     console.log('🔌 Socket connected:', socket.id, socket.user._id);
 
-    socket.on('joinRoom', ({ roomId }) => {
-      console.log(`🚪 ${socket.user.name} joined room ${roomId}`);
-      socket.join(roomId);
-    });
+    // socket.on('joinRoom', ({ roomId }) => {
+    //   console.log(`🚪 ${socket.user.name} joined room ${roomId}`);
+    //   socket.join(roomId);
+    // });
+socket.on('joinRoom', ({ roomId, doctorId, patientId, appointmentId }) => {
+  console.log(`🚪 ${socket.user.name} (${socket.user.role}) joined room ${roomId}`);
+  console.log(`📎 Appointment Context → Doctor: ${doctorId} | Patient: ${patientId} | Appointment: ${appointmentId}`);
+
+  socket.join(roomId);
+
+  // Optionally store active participants per room for audit/debug
+  socket.roomContext = { doctorId, patientId, appointmentId };
+});
 
     socket.on('sendMessage', async ({ roomId, text }) => {
       try {
