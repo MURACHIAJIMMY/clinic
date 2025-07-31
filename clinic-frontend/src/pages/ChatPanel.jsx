@@ -4,6 +4,8 @@ import { useContext, useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import SocketContext from '@/context/SocketContext'
 import useAuth from '@/hooks/useAuth'
+import api from '@/lib/axios'
+
 
 export default function ChatPanel() {
   const navigate  = useNavigate()
@@ -40,13 +42,29 @@ export default function ChatPanel() {
   const typingTimeoutRef        = useRef(null)
 
   // A) Load past messages once
-  useEffect(() => {
-    const API = import.meta.env.VITE_API_URL
-    fetch(`${API}/api/chat/rooms/${roomId}/messages`)
-      .then(res => res.json())
-      .then(setMessages)
-      .catch(console.error)
-  }, [roomId])
+  // useEffect(() => {
+  //   const API = import.meta.env.VITE_API_URL
+  //   fetch(`${API}/api/chat/rooms/${roomId}/messages`)
+  //     .then(res => res.json())
+  //     .then(setMessages)
+  //     .catch(console.error)
+  // }, [roomId])
+useEffect(() => {
+  api.get(`/chat/rooms/${roomId}/messages`)
+    .then(res => {
+      const msgs = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data.messages)
+          ? res.data.messages
+          : []
+
+      setMessages(msgs)
+    })
+    .catch(err => {
+      console.error('❌ Message fetch failed:', err)
+      setMessages([]) // fallback to empty array
+    })
+}, [roomId])
 
   // B) Auto-scroll on new message
   useEffect(() => {
