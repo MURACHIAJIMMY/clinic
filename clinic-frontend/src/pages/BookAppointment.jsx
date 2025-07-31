@@ -141,20 +141,22 @@ export default function BookAppointment() {
           >
             Profile Settings
           </Button>
-
-          {/* {selectedDoc && (
-            <Button
-              onClick={() => navigate(`/chat/${selectedDoc._id}/${user._id}`)}
-              className="w-full py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-            >
-              Chat with Dr. {selectedDoc.name}
-            </Button>
-          )} */}
-      {selectedDoc && (
+         
+     {selectedDoc && (
   <Button
-    onClick={() =>
-      navigate(`/chat/doctor_${selectedDoc._id}_patient_${user._id}`)
-    }
+    onClick={() => {
+      const matchingAppointment = upcoming.find(
+        a => a.doctorName === selectedDoc._id
+      )
+      const appointmentId = matchingAppointment?._id || null
+
+      navigate(`/chat/doctor_${selectedDoc._id}_patient_${user._id}`, {
+        state: {
+          patientId: user._id,
+          appointmentId,
+        },
+      })
+    }}
     className="w-full py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
   >
     Chat with Dr. {selectedDoc.name}
