@@ -116,7 +116,7 @@ export default function Landing() {
             onClick={cta}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-full shadow-lg transition"
           >
-            Book an Appointment
+            Login to Book an Appointment
           </button>
         </div>
       </section>
